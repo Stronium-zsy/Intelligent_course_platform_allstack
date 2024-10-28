@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.domain.Courses;
 import com.ruoyi.system.service.ICoursesService;
+import com.ruoyi.system.service.ISysUserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +44,9 @@ public class CourseUserController extends BaseController
     @Autowired
     private ICoursesService courseService;
 
+    @Autowired
+    private ISysUserService userService;
+
 
     /**
      * 查询【请填写功能名称】列表
@@ -75,7 +80,17 @@ public class CourseUserController extends BaseController
     @GetMapping(value = "/course/{courseId}")
     public AjaxResult getCourseInfo(@PathVariable("courseId") Long courseId)
     {
-        return success(courseUserService.selectCourseUserByCourseId(courseId));
+
+        List<CourseUser> courseUsers = courseUserService.selectCourseUserByCourseId(courseId); // 获取所有 CourseUser 列表>
+        List<Long> userIds = courseUsers.stream()
+                .map(CourseUser::getUserId)
+                .collect(Collectors.toList()); // 提取 userId 列表
+
+        List<SysUser> users = userIds.stream()
+                .map(userService::selectUserById)
+                .collect(Collectors.toList());
+
+        return AjaxResult.success(users);
     }
 
     /**
@@ -104,6 +119,7 @@ public class CourseUserController extends BaseController
     /**
      * 新增【请填写功能名称】
      */
+    //先查找，再添加
     @PreAuthorize("@ss.hasPermi('system:user:add')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping

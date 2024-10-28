@@ -2,6 +2,10 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +31,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @author ruoyi
  * @date 2024-10-27
  */
+@Api("课程管理")
 @RestController
 @RequestMapping("/system/courses")
 public class CoursesController extends BaseController
@@ -39,6 +44,8 @@ public class CoursesController extends BaseController
     /**
      * 查询【请填写功能名称】列表
      */
+    @ApiOperation("获取所有课程")
+    @ApiImplicitParam(name = "courses", value = "Courses", required = true, dataType = "course")
     @PreAuthorize("@ss.hasPermi('system:courses:list')")
     @GetMapping("/list")
     public TableDataInfo list(Courses courses)
@@ -54,8 +61,7 @@ public class CoursesController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:courses:export')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, Courses courses)
-    {
+    public void export(HttpServletResponse response, Courses courses) {
         List<Courses> list = coursesService.selectCoursesList(courses);
         ExcelUtil<Courses> util = new ExcelUtil<Courses>(Courses.class);
         util.exportExcel(response, list, "【请填写功能名称】数据");
@@ -85,6 +91,8 @@ public class CoursesController extends BaseController
     /**
      * 修改【请填写功能名称】
      */
+    //postman 如何测试这个接口
+
     @PreAuthorize("@ss.hasPermi('system:courses:edit')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @PutMapping
