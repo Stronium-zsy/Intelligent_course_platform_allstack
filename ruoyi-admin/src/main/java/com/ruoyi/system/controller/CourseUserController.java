@@ -26,11 +26,11 @@ import com.ruoyi.system.domain.CourseUser;
 import com.ruoyi.system.service.ICourseUserService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
-
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiImplicitParam;
 /**
- * 【请填写功能名称】Controller
- * 
- * @author ruoyi
+ * 课程用户管理Controller
+ *
  * @date 2024-10-27
  */
 @RestController
@@ -40,17 +40,17 @@ public class CourseUserController extends BaseController
     @Autowired
     private ICourseUserService courseUserService;
 
-
     @Autowired
     private ICoursesService courseService;
 
     @Autowired
     private ISysUserService userService;
 
-
     /**
-     * 查询【请填写功能名称】列表
+     * 查询课程用户列表
      */
+    @ApiOperation("获取所有课程用户")
+    @ApiImplicitParam(name = "courseUser", value = "CourseUser", required = true, dataType = "courseUser")
     @PreAuthorize("@ss.hasPermi('system:user:list')")
     @GetMapping("/list")
     public TableDataInfo list(CourseUser courseUser)
@@ -61,30 +61,33 @@ public class CourseUserController extends BaseController
     }
 
     /**
-     * 导出【请填写功能名称】列表
+     * 导出课程用户列表
      */
+    @ApiOperation("导出课程用户列表")
+    @ApiImplicitParam(name = "courseUser", value = "CourseUser", required = true, dataType = "courseUser")
     @PreAuthorize("@ss.hasPermi('system:user:export')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @Log(title = "课程用户管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CourseUser courseUser)
     {
         List<CourseUser> list = courseUserService.selectCourseUserList(courseUser);
         ExcelUtil<CourseUser> util = new ExcelUtil<CourseUser>(CourseUser.class);
-        util.exportExcel(response, list, "【请填写功能名称】数据");
+        util.exportExcel(response, list, "课程用户数据");
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取课程用户详细信息
      */
+    @ApiOperation("获取课程用户详细信息")
+    @ApiImplicitParam(name = "courseId", value = "Course ID", required = true, dataType = "long", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = "/course/{courseId}")
     public AjaxResult getCourseInfo(@PathVariable("courseId") Long courseId)
     {
-
-        List<CourseUser> courseUsers = courseUserService.selectCourseUserByCourseId(courseId); // 获取所有 CourseUser 列表>
+        List<CourseUser> courseUsers = courseUserService.selectCourseUserByCourseId(courseId);
         List<Long> userIds = courseUsers.stream()
                 .map(CourseUser::getUserId)
-                .collect(Collectors.toList()); // 提取 userId 列表
+                .collect(Collectors.toList());
 
         List<SysUser> users = userIds.stream()
                 .map(userService::selectUserById)
@@ -94,21 +97,19 @@ public class CourseUserController extends BaseController
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取课程用户详细信息
      */
+    @ApiOperation("获取课程用户详细信息")
+    @ApiImplicitParam(name = "userId", value = "User ID", required = true, dataType = "long", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:user:query')")
     @GetMapping(value = "/user/{userId}")
     public AjaxResult getUserInfo(@PathVariable("userId") Long userId)
     {
-        // 获取所有 CourseUser 列表
         List<CourseUser> courseUsers = courseUserService.selectCourseUserByUserId(userId);
-
-        // 提取 courseId 列表
         List<Long> courseIds = courseUsers.stream()
                 .map(CourseUser::getCourseId)
                 .collect(Collectors.toList());
 
-        // 根据 courseId 获取每门课程的详细信息
         List<Courses> courses = courseIds.stream()
                 .map(courseService::selectCoursesByCourseId)
                 .collect(Collectors.toList());
@@ -117,11 +118,12 @@ public class CourseUserController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增课程用户
      */
-    //先查找，再添加
+    @ApiOperation("新增课程用户")
+    @ApiImplicitParam(name = "courseUser", value = "CourseUser", required = true, dataType = "courseUser")
     @PreAuthorize("@ss.hasPermi('system:user:add')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @Log(title = "课程用户管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CourseUser courseUser)
     {
@@ -129,10 +131,12 @@ public class CourseUserController extends BaseController
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 修改课程用户
      */
+    @ApiOperation("修改课程用户")
+    @ApiImplicitParam(name = "courseUser", value = "CourseUser", required = true, dataType = "courseUser")
     @PreAuthorize("@ss.hasPermi('system:user:edit')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
+    @Log(title = "课程用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CourseUser courseUser)
     {
@@ -140,11 +144,13 @@ public class CourseUserController extends BaseController
     }
 
     /**
-     * 删除【请填写功能名称】
+     * 删除课程用户
      */
+    @ApiOperation("删除课程用户")
+    @ApiImplicitParam(name = "courseIds", value = "Course IDs", required = true, dataType = "array", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:user:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{courseIds}")
+    @Log(title = "课程用户管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{courseIds}")
     public AjaxResult remove(@PathVariable Long[] courseIds)
     {
         return toAjax(courseUserService.deleteCourseUserByCourseIds(courseIds));

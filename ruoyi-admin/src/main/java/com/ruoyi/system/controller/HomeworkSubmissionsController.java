@@ -20,13 +20,16 @@ import com.ruoyi.system.domain.HomeworkSubmissions;
 import com.ruoyi.system.service.IHomeworkSubmissionsService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 
 /**
- * 【请填写功能名称】Controller
- * 
- * @author ruoyi
+ * 作业提交管理Controller
+ *
  * @date 2024-10-27
  */
+@Api("作业提交管理")
 @RestController
 @RequestMapping("/system/homework_submissions")
 public class HomeworkSubmissionsController extends BaseController
@@ -35,8 +38,10 @@ public class HomeworkSubmissionsController extends BaseController
     private IHomeworkSubmissionsService homeworkSubmissionsService;
 
     /**
-     * 查询【请填写功能名称】列表
+     * 查询作业提交列表
      */
+    @ApiOperation("获取所有作业提交")
+    @ApiImplicitParam(name = "homeworkSubmissions", value = "HomeworkSubmissions", required = true, dataType = "homeworkSubmissions")
     @PreAuthorize("@ss.hasPermi('system:submissions:list')")
     @GetMapping("/list")
     public TableDataInfo list(HomeworkSubmissions homeworkSubmissions)
@@ -47,21 +52,25 @@ public class HomeworkSubmissionsController extends BaseController
     }
 
     /**
-     * 导出【请填写功能名称】列表
+     * 导出作业提交列表
      */
+    @ApiOperation("导出作业提交列表")
+    @ApiImplicitParam(name = "homeworkSubmissions", value = "HomeworkSubmissions", required = true, dataType = "homeworkSubmissions")
     @PreAuthorize("@ss.hasPermi('system:submissions:export')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @Log(title = "作业提交管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, HomeworkSubmissions homeworkSubmissions)
     {
         List<HomeworkSubmissions> list = homeworkSubmissionsService.selectHomeworkSubmissionsList(homeworkSubmissions);
         ExcelUtil<HomeworkSubmissions> util = new ExcelUtil<HomeworkSubmissions>(HomeworkSubmissions.class);
-        util.exportExcel(response, list, "【请填写功能名称】数据");
+        util.exportExcel(response, list, "作业提交数据");
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取作业提交详细信息
      */
+    @ApiOperation("获取作业提交详细信息")
+    @ApiImplicitParam(name = "submissionId", value = "Submission ID", required = true, dataType = "long", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:submissions:query')")
     @GetMapping(value = "/{submissionId}")
     public AjaxResult getInfo(@PathVariable("submissionId") Long submissionId)
@@ -70,10 +79,12 @@ public class HomeworkSubmissionsController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增作业提交
      */
+    @ApiOperation("新增作业提交")
+    @ApiImplicitParam(name = "homeworkSubmissions", value = "HomeworkSubmissions", required = true, dataType = "homeworkSubmissions")
     @PreAuthorize("@ss.hasPermi('system:submissions:add')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @Log(title = "作业提交管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody HomeworkSubmissions homeworkSubmissions)
     {
@@ -81,10 +92,12 @@ public class HomeworkSubmissionsController extends BaseController
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 修改作业提交
      */
+    @ApiOperation("修改作业提交")
+    @ApiImplicitParam(name = "homeworkSubmissions", value = "HomeworkSubmissions", required = true, dataType = "homeworkSubmissions")
     @PreAuthorize("@ss.hasPermi('system:submissions:edit')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
+    @Log(title = "作业提交管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody HomeworkSubmissions homeworkSubmissions)
     {
@@ -92,11 +105,13 @@ public class HomeworkSubmissionsController extends BaseController
     }
 
     /**
-     * 删除【请填写功能名称】
+     * 删除作业提交
      */
+    @ApiOperation("删除作业提交")
+    @ApiImplicitParam(name = "submissionIds", value = "Submission IDs", required = true, dataType = "array", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:submissions:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{submissionIds}")
+    @Log(title = "作业提交管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{submissionIds}")
     public AjaxResult remove(@PathVariable Long[] submissionIds)
     {
         return toAjax(homeworkSubmissionsService.deleteHomeworkSubmissionsBySubmissionIds(submissionIds));

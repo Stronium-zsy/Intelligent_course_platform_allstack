@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -22,11 +25,11 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 【请填写功能名称】Controller
- * 
- * @author ruoyi
+ * 课程作业管理Controller
+ *
  * @date 2024-10-27
  */
+@Api("课程作业管理")
 @RestController
 @RequestMapping("/system/course_homework")
 public class CourseHomeworkController extends BaseController
@@ -35,8 +38,10 @@ public class CourseHomeworkController extends BaseController
     private ICourseHomeworkService courseHomeworkService;
 
     /**
-     * 查询【请填写功能名称】列表
+     * 查询课程作业列表
      */
+    @ApiOperation("获取所有课程作业")
+    @ApiImplicitParam(name = "courseHomework", value = "CourseHomework", required = true, dataType = "courseHomework")
     @PreAuthorize("@ss.hasPermi('system:homework:list')")
     @GetMapping("/list")
     public TableDataInfo list(CourseHomework courseHomework)
@@ -47,21 +52,25 @@ public class CourseHomeworkController extends BaseController
     }
 
     /**
-     * 导出【请填写功能名称】列表
+     * 导出课程作业列表
      */
+    @ApiOperation("导出课程作业列表")
+    @ApiImplicitParam(name = "courseHomework", value = "CourseHomework", required = true, dataType = "courseHomework")
     @PreAuthorize("@ss.hasPermi('system:homework:export')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @Log(title = "课程作业管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CourseHomework courseHomework)
     {
         List<CourseHomework> list = courseHomeworkService.selectCourseHomeworkList(courseHomework);
         ExcelUtil<CourseHomework> util = new ExcelUtil<CourseHomework>(CourseHomework.class);
-        util.exportExcel(response, list, "【请填写功能名称】数据");
+        util.exportExcel(response, list, "课程作业数据");
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取课程作业详细信息
      */
+    @ApiOperation("获取课程作业详细信息")
+    @ApiImplicitParam(name = "homeworkId", value = "Homework ID", required = true, dataType = "long", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:homework:query')")
     @GetMapping(value = "/{homeworkId}")
     public AjaxResult getInfo(@PathVariable("homeworkId") Long homeworkId)
@@ -70,10 +79,12 @@ public class CourseHomeworkController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增课程作业
      */
+    @ApiOperation("新增课程作业")
+    @ApiImplicitParam(name = "courseHomework", value = "CourseHomework", required = true, dataType = "courseHomework")
     @PreAuthorize("@ss.hasPermi('system:homework:add')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @Log(title = "课程作业管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CourseHomework courseHomework)
     {
@@ -81,10 +92,12 @@ public class CourseHomeworkController extends BaseController
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 修改课程作业
      */
+    @ApiOperation("修改课程作业")
+    @ApiImplicitParam(name = "courseHomework", value = "CourseHomework", required = true, dataType = "courseHomework")
     @PreAuthorize("@ss.hasPermi('system:homework:edit')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
+    @Log(title = "课程作业管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CourseHomework courseHomework)
     {
@@ -92,11 +105,13 @@ public class CourseHomeworkController extends BaseController
     }
 
     /**
-     * 删除【请填写功能名称】
+     * 删除课程作业
      */
+    @ApiOperation("删除课程作业")
+    @ApiImplicitParam(name = "homeworkIds", value = "Homework IDs", required = true, dataType = "array", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:homework:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{homeworkIds}")
+    @Log(title = "课程作业管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{homeworkIds}")
     public AjaxResult remove(@PathVariable Long[] homeworkIds)
     {
         return toAjax(courseHomeworkService.deleteCourseHomeworkByHomeworkIds(homeworkIds));
