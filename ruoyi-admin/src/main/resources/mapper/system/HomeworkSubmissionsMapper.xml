@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.HomeworkSubmissionsMapper">
+    
+    <resultMap type="HomeworkSubmissions" id="HomeworkSubmissionsResult">
+        <result property="submissionId"    column="submission_id"    />
+        <result property="homeworkId"    column="homework_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="submittedAt"    column="submitted_at"    />
+        <result property="grade"    column="grade"    />
+        <result property="feedback"    column="feedback"    />
+    </resultMap>
+
+    <sql id="selectHomeworkSubmissionsVo">
+        select submission_id, homework_id, user_id, file_path, submitted_at, grade, feedback from homework_submissions
+    </sql>
+
+    <select id="selectHomeworkSubmissionsList" parameterType="HomeworkSubmissions" resultMap="HomeworkSubmissionsResult">
+        <include refid="selectHomeworkSubmissionsVo"/>
+        <where>  
+            <if test="homeworkId != null "> and homework_id = #{homeworkId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="filePath != null  and filePath != ''"> and file_path = #{filePath}</if>
+            <if test="submittedAt != null "> and submitted_at = #{submittedAt}</if>
+            <if test="grade != null "> and grade = #{grade}</if>
+            <if test="feedback != null  and feedback != ''"> and feedback = #{feedback}</if>
+        </where>
+    </select>
+    
+    <select id="selectHomeworkSubmissionsBySubmissionId" parameterType="Long" resultMap="HomeworkSubmissionsResult">
+        <include refid="selectHomeworkSubmissionsVo"/>
+        where submission_id = #{submissionId}
+    </select>
+
+    <insert id="insertHomeworkSubmissions" parameterType="HomeworkSubmissions" useGeneratedKeys="true" keyProperty="submissionId">
+        insert into homework_submissions
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="homeworkId != null">homework_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="submittedAt != null">submitted_at,</if>
+            <if test="grade != null">grade,</if>
+            <if test="feedback != null">feedback,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="homeworkId != null">#{homeworkId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="filePath != null and filePath != ''">#{filePath},</if>
+            <if test="submittedAt != null">#{submittedAt},</if>
+            <if test="grade != null">#{grade},</if>
+            <if test="feedback != null">#{feedback},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHomeworkSubmissions" parameterType="HomeworkSubmissions">
+        update homework_submissions
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="homeworkId != null">homework_id = #{homeworkId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="filePath != null and filePath != ''">file_path = #{filePath},</if>
+            <if test="submittedAt != null">submitted_at = #{submittedAt},</if>
+            <if test="grade != null">grade = #{grade},</if>
+            <if test="feedback != null">feedback = #{feedback},</if>
+        </trim>
+        where submission_id = #{submissionId}
+    </update>
+
+    <delete id="deleteHomeworkSubmissionsBySubmissionId" parameterType="Long">
+        delete from homework_submissions where submission_id = #{submissionId}
+    </delete>
+
+    <delete id="deleteHomeworkSubmissionsBySubmissionIds" parameterType="String">
+        delete from homework_submissions where submission_id in 
+        <foreach item="submissionId" collection="array" open="(" separator="," close=")">
+            #{submissionId}
+        </foreach>
+    </delete>
+</mapper>

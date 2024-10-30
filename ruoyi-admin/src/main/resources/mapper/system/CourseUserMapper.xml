@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CourseUserMapper">
+    
+    <resultMap type="CourseUser" id="CourseUserResult">
+        <result property="courseId"    column="course_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="role"    column="role"    />
+        <result property="enrolledAt"    column="enrolled_at"    />
+    </resultMap>
+
+    <sql id="selectCourseUserVo">
+        select course_id, user_id, role, enrolled_at from course_user
+    </sql>
+
+    <select id="selectCourseUserList" parameterType="CourseUser" resultMap="CourseUserResult">
+        <include refid="selectCourseUserVo"/>
+        <where>  
+            <if test="role != null  and role != ''"> and role = #{role}</if>
+            <if test="enrolledAt != null "> and enrolled_at = #{enrolledAt}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseUserByCourseId" parameterType="Long" resultMap="CourseUserResult">
+        <include refid="selectCourseUserVo"/>
+        where course_id = #{courseId}
+    </select>
+
+    <select id="selectCourseUserByUserId" parameterType="Long" resultMap="CourseUserResult">
+        <include refid="selectCourseUserVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertCourseUser" parameterType="CourseUser">
+        insert into course_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="role != null and role != ''">role,</if>
+            <if test="enrolledAt != null">enrolled_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="role != null and role != ''">#{role},</if>
+            <if test="enrolledAt != null">#{enrolledAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseUser" parameterType="CourseUser">
+        update course_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="role != null and role != ''">role = #{role},</if>
+            <if test="enrolledAt != null">enrolled_at = #{enrolledAt},</if>
+        </trim>
+        where course_id = #{courseId}
+    </update>
+
+    <delete id="deleteCourseUserByCourseId" parameterType="Long">
+        delete from course_user where course_id = #{courseId}
+    </delete>
+
+    <delete id="deleteCourseUserByCourseIds" parameterType="String">
+        delete from course_user where course_id in 
+        <foreach item="courseId" collection="array" open="(" separator="," close=")">
+            #{courseId}
+        </foreach>
+    </delete>
+</mapper>

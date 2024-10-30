@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CourseHomeworkMapper">
+    
+    <resultMap type="CourseHomework" id="CourseHomeworkResult">
+        <result property="homeworkId"    column="homework_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="title"    column="title"    />
+        <result property="description"    column="description"    />
+        <result property="dueDate"    column="due_date"    />
+        <result property="createdAt"    column="created_at"    />
+    </resultMap>
+
+    <sql id="selectCourseHomeworkVo">
+        select homework_id, course_id, title, description, due_date, created_at from course_homework
+    </sql>
+
+    <select id="selectCourseHomeworkList" parameterType="CourseHomework" resultMap="CourseHomeworkResult">
+        <include refid="selectCourseHomeworkVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="dueDate != null "> and due_date = #{dueDate}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseHomeworkByHomeworkId" parameterType="Long" resultMap="CourseHomeworkResult">
+        <include refid="selectCourseHomeworkVo"/>
+        where homework_id = #{homeworkId}
+    </select>
+
+    <insert id="insertCourseHomework" parameterType="CourseHomework" useGeneratedKeys="true" keyProperty="homeworkId">
+        insert into course_homework
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="description != null">description,</if>
+            <if test="dueDate != null">due_date,</if>
+            <if test="createdAt != null">created_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="description != null">#{description},</if>
+            <if test="dueDate != null">#{dueDate},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseHomework" parameterType="CourseHomework">
+        update course_homework
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="dueDate != null">due_date = #{dueDate},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+        </trim>
+        where homework_id = #{homeworkId}
+    </update>
+
+    <delete id="deleteCourseHomeworkByHomeworkId" parameterType="Long">
+        delete from course_homework where homework_id = #{homeworkId}
+    </delete>
+
+    <delete id="deleteCourseHomeworkByHomeworkIds" parameterType="String">
+        delete from course_homework where homework_id in 
+        <foreach item="homeworkId" collection="array" open="(" separator="," close=")">
+            #{homeworkId}
+        </foreach>
+    </delete>
+</mapper>
