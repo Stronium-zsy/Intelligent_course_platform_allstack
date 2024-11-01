@@ -26,9 +26,8 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
- * 【请填写功能名称】Controller
- * 
- * @author ruoyi
+ * 课程管理Controller
+ *
  * @date 2024-10-27
  */
 @Api("课程管理")
@@ -39,10 +38,8 @@ public class CoursesController extends BaseController
     @Autowired
     private ICoursesService coursesService;
 
-
-
     /**
-     * 查询【请填写功能名称】列表
+     * 查询课程列表
      */
     @ApiOperation("获取所有课程")
     @ApiImplicitParam(name = "courses", value = "Courses", required = true, dataType = "course")
@@ -56,20 +53,24 @@ public class CoursesController extends BaseController
     }
 
     /**
-     * 导出【请填写功能名称】列表
+     * 导出课程列表
      */
+    @ApiOperation("导出课程列表")
+    @ApiImplicitParam(name = "courses", value = "Courses", required = true, dataType = "course")
     @PreAuthorize("@ss.hasPermi('system:courses:export')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @Log(title = "课程管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, Courses courses) {
         List<Courses> list = coursesService.selectCoursesList(courses);
         ExcelUtil<Courses> util = new ExcelUtil<Courses>(Courses.class);
-        util.exportExcel(response, list, "【请填写功能名称】数据");
+        util.exportExcel(response, list, "课程数据");
     }
 
     /**
-     * 获取【请填写功能名称】详细信息
+     * 获取课程详细信息
      */
+    @ApiOperation("获取课程详细信息")
+    @ApiImplicitParam(name = "courseId", value = "Course ID", required = true, dataType = "long", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:courses:query')")
     @GetMapping(value = "/{courseId}")
     public AjaxResult getInfo(@PathVariable("courseId") Long courseId)
@@ -78,10 +79,12 @@ public class CoursesController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增课程
      */
+    @ApiOperation("新增课程")
+    @ApiImplicitParam(name = "courses", value = "Courses", required = true, dataType = "course")
     @PreAuthorize("@ss.hasPermi('system:courses:add')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @Log(title = "课程管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody Courses courses)
     {
@@ -89,12 +92,12 @@ public class CoursesController extends BaseController
     }
 
     /**
-     * 修改【请填写功能名称】
+     * 修改课程
      */
-    //postman 如何测试这个接口
-
+    @ApiOperation("修改课程")
+    @ApiImplicitParam(name = "courses", value = "Courses", required = true, dataType = "course")
     @PreAuthorize("@ss.hasPermi('system:courses:edit')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
+    @Log(title = "课程管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody Courses courses)
     {
@@ -102,11 +105,13 @@ public class CoursesController extends BaseController
     }
 
     /**
-     * 删除【请填写功能名称】
+     * 删除课程
      */
+    @ApiOperation("删除课程")
+    @ApiImplicitParam(name = "courseIds", value = "Course IDs", required = true, dataType = "array", paramType = "path")
     @PreAuthorize("@ss.hasPermi('system:courses:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{courseIds}")
+    @Log(title = "课程管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{courseIds}")
     public AjaxResult remove(@PathVariable Long[] courseIds)
     {
         return toAjax(coursesService.deleteCoursesByCourseIds(courseIds));
