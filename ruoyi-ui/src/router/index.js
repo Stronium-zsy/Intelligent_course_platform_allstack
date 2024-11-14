@@ -75,20 +75,66 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/courses',
-    component:Layout,
-    redirect:'/courses',
-    hidden:false,
-    children:[
+    path: '/courseDetail/:courseId',
+    name: 'CourseDetail',
+    hidden: true,
+    component: () => import('@/views/system/courses/courseDetail.vue'),
+    children: [
       {
-        path:'/courses',
-        component:() => import('@/views/courses'),
-        name:'courses',
-        meta: { title: '所有课程', icon: 'education', affix: true }
-
-
+        path: "/courseDetail/:courseId/overview",
+        name: "Overview",
+        component: () => import('@/views/system/courses/courseOverview.vue'),
+        meta: { title: "课程介绍" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseHomework/:homeworkId",
+        name: "Overview",
+        hidden: true,
+        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        meta: { title: "作业详情" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseSyllabus",
+        name: "Syllabus",
+        component: () => import('@/views/system/courses/courseSyllabus.vue'),
+        meta: { title: "教学大纲" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseCalendar",
+        name: "Calendar",
+        component: () => import('@/views/system/courses/courseCalendar.vue'),
+        meta: { title: "教学日历" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseNotifications",
+        name: "Notifications",
+        component: () => import('@/views/system/courses/courseNotifications.vue'),
+        meta: { title: "课程通知" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseFiles",
+        name: "Files",
+        component: () => import('@/views/system/courses/courseFiles.vue'),
+        meta: { title: "文件资料" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseVideos",
+        name: "Videos",
+        component: () => import('@/views/system/courses/courseVideos.vue'),
+        meta: { title: "视频资料" }
+      },
+      {
+        path: "/courseDetail/:courseId/homework/:Id",
+        name: "HomeworkDetail",
+        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        meta: { title: "作业详情" }
+      },
+      {
+        path: "/courseDetail/:courseId/courseHomework",
+        name: "Homework",
+        component: () => import('@/views/system/courses/courseHomework.vue'),
+        meta: { title: "课程作业" }
       }
-
     ]
   },
 

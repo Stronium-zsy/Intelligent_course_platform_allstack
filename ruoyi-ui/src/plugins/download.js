@@ -1,9 +1,9 @@
 import axios from 'axios'
 import {Loading, Message} from 'element-ui'
-import { saveAs } from 'file-saver'
-import { getToken } from '@/utils/auth'
+import {saveAs} from 'file-saver'
+import {getToken} from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
-import { blobValidate } from "@/utils/ruoyi";
+import {blobValidate} from "@/utils/ruoyi";
 
 const baseURL = process.env.VUE_APP_BASE_API
 let downloadLoadingInstance;
@@ -38,11 +38,36 @@ export default {
       if (isBlob) {
         const blob = new Blob([res.data])
         this.saveAs(blob, decodeURIComponent(res.headers['download-filename']))
+        return blob;
       } else {
         this.printErrMsg(res.data);
       }
     })
   },
+  async __resource__(resource) {
+    const url = baseURL + "/common/download/resource?resource=" + encodeURIComponent(resource);
+    try {
+      const res = await axios({
+        method: 'get',
+        url: url,
+        responseType: 'blob',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      });
+
+      const isBlob = blobValidate(res.data);
+      if (isBlob) {
+        return new Blob([res.data]); // 返回 blob
+      } else {
+        await this.printErrMsg(res.data); // 打印错误信息
+        return null; // 返回 null，表示获取 blob 失败
+      }
+    } catch (error) {
+      console.error('Error fetching resource:', error);
+      Message.error('下载文件出现错误，请联系管理员！');
+      return null;
+    }
+  },
+
   zip(url, name) {
     var url = baseURL + url
     downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
