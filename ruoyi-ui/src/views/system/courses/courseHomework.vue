@@ -223,6 +223,7 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+
     },
     navigateTo(routePath) {
       this.$router.push(
