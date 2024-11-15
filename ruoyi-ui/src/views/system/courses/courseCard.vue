@@ -120,8 +120,8 @@ export default {
 .card {
   position: relative;
   flex: 0 0 240px;
-  width: 300px;
-  height: 450px;
+  width: 250px;
+  height: 350px;
   background-color: #333;
   overflow: hidden;
   border-radius: 10px;
