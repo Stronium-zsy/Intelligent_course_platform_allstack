@@ -117,8 +117,9 @@ CREATE TABLE `courses` (
   `course_video` varchar(255) DEFAULT NULL,
   `course_name` varchar(255) NOT NULL,
   `course_description` text,
+  `course_image` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`course_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,7 +128,7 @@ CREATE TABLE `courses` (
 
 LOCK TABLES `courses` WRITE;
 /*!40000 ALTER TABLE `courses` DISABLE KEYS */;
-INSERT INTO `courses` VALUES (1,'lll','fwalegfowegofwao','2','ofoeasfowoae'),(2,'gaweg','fwalegfowegofwao','helllllllo','fwaeofoawefo'),(3,NULL,'fwalegfowegofwao','helllllllo','fmwaepfpwea');
+INSERT INTO `courses` VALUES (1,'','','大学物理','基础大学物理学','/course-pictures/course1.png'),(2,'','','数据库','数据库基本原理与设计','/course-pictures/course2.png'),(3,NULL,'','深度学习','基础深度学习算法与模型','/course-pictures/course3.png'),(4,NULL,NULL,'数据结构与算法  ','学习数据的组织和算法的设计，提升编程效率和问题解决能力。','/course-pictures/course4.png'),(5,NULL,NULL,'计算机网络','理解网络协议和通信原理，掌握互联网结构及其运作机制。','/course-pictures/course5.png'),(6,NULL,NULL,'计算机组成原理  ','理解计算机的硬件结构，包括CPU、内存和输入/输出设备。','/course-pictures/course6.png');
 /*!40000 ALTER TABLE `courses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1157,4 +1158,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-15 15:21:35
+-- Dump completed on 2024-11-16 23:21:40
