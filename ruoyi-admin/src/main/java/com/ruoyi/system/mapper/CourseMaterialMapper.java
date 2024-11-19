@@ -15,7 +15,7 @@ public interface CourseMaterialMapper
      * 查询【请填写功能名称】
      * 
      * @param materialId 【请填写功能名称】主键
-     * @return 【请填写功能名称】
+     * @return 课程资料
      */
     public CourseMaterial selectCourseMaterialByMaterialId(Long materialId);
 

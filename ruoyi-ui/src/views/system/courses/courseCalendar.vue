@@ -53,6 +53,7 @@ export default {
     <FileUpload
       :uploadPath="customUploadPath"
       :upload-params="uploadParams"
+      v-has-permi="['system:material:add']"
     />
   </div>
 </template>

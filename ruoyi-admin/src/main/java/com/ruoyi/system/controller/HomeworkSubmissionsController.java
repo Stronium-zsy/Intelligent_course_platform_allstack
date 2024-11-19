@@ -66,13 +66,14 @@ public class HomeworkSubmissionsController extends BaseController
         ExcelUtil<HomeworkSubmissions> util = new ExcelUtil<HomeworkSubmissions>(HomeworkSubmissions.class);
         util.exportExcel(response, list, "【请填写功能名称】数据");
     }
-    @PreAuthorize("@ss.hasPermi('system:submissions:uploadHomework')")
+    @PreAuthorize("@ss.hasPermi('system:submissions:add')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/uploadHomework")
     public AjaxResult uploadFile(MultipartFile file,HomeworkSubmissions homeworkSubmissions) throws Exception
     {
         try
         {
+            Boolean isValid = homeworkSubmissionsService.selectHomeworkSubmissionsList(homeworkSubmissions).stream().noneMatch(hs -> hs.getHomeworkId().equals(homeworkSubmissions.getHomeworkId()) && hs.getUserId().equals(homeworkSubmissions.getUserId()));
             String fileName = FileUploadUtils.upload(
                     "E:/IdeaProjects/Intelligent_course_platform/" +
                             "course_homework/"+homeworkSubmissions.getCourseId()+"/"+"homework/"+homeworkSubmissions.getHomeworkId()+"/user/"+homeworkSubmissions.getUserId(), file);
@@ -83,7 +84,12 @@ public class HomeworkSubmissionsController extends BaseController
             ajax.put("fileName", fileName);
             ajax.put("newFileName", FileUtils.getName(fileName));
             ajax.put("originalFilename", file.getOriginalFilename());
-            ajax.put("insertResult",homeworkSubmissionsService.insertHomeworkSubmissions(homeworkSubmissions));
+            System.out.println(homeworkSubmissions);
+            if (isValid) {
+                ajax.put("insertResult",homeworkSubmissionsService.insertHomeworkSubmissions(homeworkSubmissions));
+            }else{
+                ajax.put("updateResult",homeworkSubmissionsService.updateHomeworkSubmissions(homeworkSubmissions));
+            }
             return ajax;
         }
         catch (Exception e)
@@ -117,7 +123,7 @@ public class HomeworkSubmissionsController extends BaseController
      * 修改【请填写功能名称】
      */
     @PreAuthorize("@ss.hasPermi('system:submissions:edit')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
+    @Log(title = "提交作业分数", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody HomeworkSubmissions homeworkSubmissions)
     {

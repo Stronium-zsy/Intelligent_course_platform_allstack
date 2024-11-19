@@ -37,7 +37,7 @@ public class CourseHomeworkController extends BaseController
     /**
      * 查询【请填写功能名称】列表
      */
-    @PreAuthorize("@ss.hasPermi('system:homework:list')")
+    @PreAuthorize("@ss.hasPermi('system:homework:query')")
     @GetMapping("/list")
     public TableDataInfo list(CourseHomework courseHomework)
     {

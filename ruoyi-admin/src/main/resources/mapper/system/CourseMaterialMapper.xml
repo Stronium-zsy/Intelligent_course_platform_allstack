@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCourseMaterialVo">
-        select material_id, course_id, title, file_path, created_at from course_material
+        select material_id, course_id, title, file_path, created_at, material_type from course_material
     </sql>
 
     <select id="selectCourseMaterialList" parameterType="CourseMaterial" resultMap="CourseMaterialResult">
@@ -62,7 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createdAt != null">created_at = #{createdAt},</if>
             <if test="materialType != null">material_type = #{materialType},</if>
         </trim>
-        where material_id = #{materialId}
+        where course_id = #{courseId}
     </update>
 
     <delete id="deleteCourseMaterialByMaterialId" parameterType="Long">

@@ -70,6 +70,7 @@ export default {
     /** 获取课程列表 */
     getList() {
       this.loading = true;
+
       listCourses(this.queryParams).then(response => {
         this.coursesList = response.rows;
         this.total = response.total;

@@ -123,17 +123,20 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:homework:remove']"
           >删除</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" v-has-permi="['system:homework:edit'] ">
-        <template slot-scope="scope">
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:homework:edit']"
+            v-hasPermi="['system:submissions:add']"
           >提交</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleCorrection(scope.row)"
+            v-hasPermi="['system:submissions:query']"
+          >批改</el-button>
         </template>
 
       </el-table-column>
@@ -225,10 +228,12 @@ export default {
       });
 
     },
+    handleCorrection(row) {
+      this.$router.push("/courseDetail/"+this.$router.currentRoute.params.courseId+"/homeworkCorrection/" + row.homeworkId);
+    },
     navigateTo(routePath) {
       this.$router.push(
         routePath
-
       );
     },
     // 取消按钮
@@ -329,6 +334,8 @@ export default {
 </script>
 <style>
 .app-container{
+  display:flex;
+  flex-direction: column;
   width:80%;
   margin-left:230px;
 }

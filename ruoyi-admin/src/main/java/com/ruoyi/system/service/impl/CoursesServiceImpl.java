@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.CoursesMapper;
@@ -40,7 +42,9 @@ public class CoursesServiceImpl implements ICoursesService
     @Override
     public List<Courses> selectCoursesList(Courses courses)
     {
-        return coursesMapper.selectCoursesList(courses);
+        Long userId = SecurityUtils.getUserId();
+        System.out.println(userId);
+        return coursesMapper.selectCoursesList(courses,userId);
     }
 
     /**

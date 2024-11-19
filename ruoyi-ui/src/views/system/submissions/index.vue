@@ -1,171 +1,71 @@
 <template>
-  <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="${comment}" prop="homeworkId">
-        <el-input
-          v-model="queryParams.homeworkId"
-          placeholder="请输入${comment}"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="${comment}" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入${comment}"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="${comment}" prop="submittedAt">
-        <el-date-picker clearable
-          v-model="queryParams.submittedAt"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择${comment}">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="${comment}" prop="grade">
-        <el-input
-          v-model="queryParams.grade"
-          placeholder="请输入${comment}"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="submissions-container">
+    <div class="homework-list">
+      <el-table v-loading="loading" :data="submissionsList" @selection-change="handleSelectionChange">
+        <el-table-column label="作业名称" align="center" prop="filePath" >
+          <template slot-scope="scope" >
+            <span @click="checkHomework(scope.row.filePath)">{{ getLastName(scope.row.filePath) }}</span>
+          </template>
+        </el-table-column>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:submissions:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:submissions:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:submissions:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:submissions:export']"
-        >导出</el-button>
-      </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
+        <el-table-column label="提交时间" align="center" prop="submittedAt" width="180">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.submittedAt, '{y}-{m}-{d}') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUpdate(scope.row)"
+              v-hasPermi="['system:submissions:edit']"
+            >评分</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <el-table v-loading="loading" :data="submissionsList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="${comment}" align="center" prop="submissionId" />
-      <el-table-column label="${comment}" align="center" prop="homeworkId" />
-      <el-table-column label="${comment}" align="center" prop="userId" />
-      <el-table-column label="${comment}" align="center" prop="filePath" />
-      <el-table-column label="${comment}" align="center" prop="submittedAt" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.submittedAt, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="${comment}" align="center" prop="grade" />
-      <el-table-column label="${comment}" align="center" prop="feedback" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:submissions:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:submissions:remove']"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
 
-    <!-- 添加或修改【请填写功能名称】对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="${comment}" prop="homeworkId">
-          <el-input v-model="form.homeworkId" placeholder="请输入${comment}" />
-        </el-form-item>
-        <el-form-item label="${comment}" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入${comment}" />
-        </el-form-item>
-        <el-form-item label="${comment}" prop="filePath">
-          <el-input v-model="form.filePath" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="${comment}" prop="submittedAt">
-          <el-date-picker clearable
-            v-model="form.submittedAt"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择${comment}">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="${comment}" prop="grade">
-          <el-input v-model="form.grade" placeholder="请输入${comment}" />
-        </el-form-item>
-        <el-form-item label="${comment}" prop="feedback">
-          <el-input v-model="form.feedback" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
+      <!-- 添加或修改【请填写功能名称】对话框 -->
+      <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+
+          <el-form-item label="分数" prop="grade">
+            <el-input v-model="form.grade" placeholder="请输入分数" />
+          </el-form-item>
+          <el-form-item label="反馈" prop="feedback">
+            <el-input v-model="form.feedback" type="textarea" placeholder="请输入作业反馈" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </el-dialog>
+
+    </div>
+    <div class="homework-detail">
+      <PdfViewer :pdf-path="checkedHomework" v-if="checkedHomework" :key="checkedHomework" />
+    </div>
+
   </div>
 </template>
 
 <script>
 import { listSubmissions, getSubmissions, delSubmissions, addSubmissions, updateSubmissions } from "@/api/system/submissions";
+import PdfViewer from "@/views/tool/pdf/PDF.vue";
 
 export default {
   name: "Submissions",
+  components: {PdfViewer},
   data() {
     return {
       // 遮罩层
@@ -197,6 +97,7 @@ export default {
         grade: null,
         feedback: null
       },
+      checkedHomework:"",
       // 表单参数
       form: {},
       // 表单校验
@@ -225,6 +126,9 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+    checkHomework(homeworkPath){
+      this.checkedHomework=homeworkPath
     },
     // 取消按钮
     cancel() {
@@ -273,7 +177,7 @@ export default {
       getSubmissions(submissionId).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改【请填写功能名称】";
+        this.title = "请打分并对作业做出评价";
       });
     },
     /** 提交按钮 */
@@ -306,6 +210,11 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
+    getLastName(filePath) {
+      if (!filePath) return '';
+      const parts = filePath.split('/');
+      return parts[parts.length - 1]; // 返回最后的部分
+    },
     /** 导出按钮操作 */
     handleExport() {
       this.download('system/submissions/export', {
@@ -315,3 +224,21 @@ export default {
   }
 };
 </script>
+<style>
+.submissions-container{
+  margin-left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:row;
+}
+.homework-list{
+  flex-direction:column;
+  height:auto;
+  width:25%;
+}
+.homework-detail{
+  width:65%;
+  margin-left:5%;
+}
+</style>

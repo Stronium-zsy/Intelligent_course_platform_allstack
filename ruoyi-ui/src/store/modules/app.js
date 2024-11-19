@@ -6,6 +6,12 @@ const state = {
     withoutAnimation: false,
     hide: false
   },
+  courseDetailSideBar:{
+    opened: Cookies.get('courseDetailSideBarStatus') ? !!+Cookies.get('courseDetailSideBarStatus') : true,
+    withoutAnimation: false,
+    hide: false
+
+  },
   device: 'desktop',
   size: Cookies.get('size') || 'medium'
 }
@@ -37,6 +43,26 @@ const mutations = {
   },
   SET_SIDEBAR_HIDE: (state, status) => {
     state.sidebar.hide = status
+  },
+  TOGGLE_COURSE_SIDEBAR: state => {
+    if (state.courseDetailSideBar.hide) {
+      return false;
+    }
+    state.courseDetailSideBar.opened = !state.courseDetailSideBar.opened
+    state.courseDetailSideBar.withoutAnimation = false
+    if (state.courseDetailSideBar.opened) {
+      Cookies.set('courseDetailSideBarStatus', 1)
+    } else {
+      Cookies.set('courseDetailSideBarStatus', 0)
+    }
+  },
+  CLOSE_COURSE_SIDEBAR: (state, withoutAnimation) => {
+    Cookies.set('courseDetailSideBarStatus', 0)
+    state.courseDetailSideBar.opened = false
+    state.courseDetailSideBar.withoutAnimation = withoutAnimation
+  },
+  SET_COURSE_SIDEBAR_HIDE: (state, status) => {
+    state.courseDetailSideBar.hide = status
   }
 }
 
@@ -55,6 +81,15 @@ const actions = {
   },
   toggleSideBarHide({ commit }, status) {
     commit('SET_SIDEBAR_HIDE', status)
+  },
+  toggleCourseSideBar({ commit }) {
+    commit('TOGGLE_COURSE_SIDEBAR')
+  },
+  closeCourseSideBar({ commit }, { withoutAnimation }) {
+    commit('CLOSE_COURSE_SIDEBAR', withoutAnimation)
+  },
+  toggleCourseSideBarHide({ commit }, status) {
+    commit('SET_COURSE_SIDEBAR_HIDE', status)
   }
 }
 

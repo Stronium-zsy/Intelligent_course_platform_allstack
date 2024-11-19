@@ -16,7 +16,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectHomeworkSubmissionsVo">
-        select submission_id, homework_id, user_id, file_path, submitted_at, grade, feedback,courseId from homework_submissions
+        select submission_id, homework_id, user_id, file_path, submitted_at, grade, feedback,course_id from homework_submissions
     </sql>
 
     <select id="selectHomeworkSubmissionsList" parameterType="HomeworkSubmissions" resultMap="HomeworkSubmissionsResult">
@@ -28,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="submittedAt != null "> and submitted_at = #{submittedAt}</if>
             <if test="grade != null "> and grade = #{grade}</if>
             <if test="feedback != null  and feedback != ''"> and feedback = #{feedback}</if>
-            <if test="courseId != null  and courseId != ''"> and courseId = #{courseId}</if>
+            <if test="courseId != null  and courseId != ''"> and course_id = #{courseId}</if>
         </where>
     </select>
     
@@ -68,9 +68,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="submittedAt != null">submitted_at = #{submittedAt},</if>
             <if test="grade != null">grade = #{grade},</if>
             <if test="feedback != null">feedback = #{feedback},</if>
-            <if test="courseId!= null">#course_id=#{courseId},</if>
+            <if test="courseId!= null">course_id=#{courseId},</if>
         </trim>
-        where submission_id = #{submissionId}
+        where user_id = #{userId} and homework_id = #{homeworkId}
     </update>
 
     <delete id="deleteHomeworkSubmissionsBySubmissionId" parameterType="Long">

@@ -2,6 +2,8 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.system.domain.CourseUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,8 @@ public class CoursesController extends BaseController
 {
     @Autowired
     private ICoursesService coursesService;
+
+
 
     /**
      * 查询【请填写功能名称】列表

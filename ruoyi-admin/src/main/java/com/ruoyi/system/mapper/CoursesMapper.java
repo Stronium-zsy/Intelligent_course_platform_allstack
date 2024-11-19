@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import java.util.List;
 import com.ruoyi.system.domain.Courses;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -25,7 +26,9 @@ public interface CoursesMapper
      * @param courses 【请填写功能名称】
      * @return 【请填写功能名称】集合
      */
-    public List<Courses> selectCoursesList(Courses courses);
+    public List<Courses> selectCoursesList(
+            @org.apache.ibatis.annotations.Param("course") Courses courses,
+            @org.apache.ibatis.annotations.Param("userId") Long userId);
 
     /**
      * 新增【请填写功能名称】

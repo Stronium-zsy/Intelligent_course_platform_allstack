@@ -46,7 +46,7 @@ public class CourseMaterialController extends BaseController
     /**
      * 查询【请填写功能名称】列表
      */
-    @PreAuthorize("@ss.hasPermi('system:material:list')")
+    @PreAuthorize("@ss.hasPermi('system:material:query')")
     @GetMapping("/list")
     public TableDataInfo list(CourseMaterial courseMaterial)
     {
@@ -88,6 +88,8 @@ public class CourseMaterialController extends BaseController
     {
         try
         {
+            Boolean isValid= courseMaterialService.selectCourseMaterialList(courseMaterial).stream().noneMatch(c->(c.getCourseId()==courseMaterial.getCourseId()&&c.getMaterialType().equals(courseMaterial.getMaterialType())));
+            System.out.println(isValid);
             String fileName = FileUploadUtils.upload(
                     "E:/IdeaProjects/Intelligent_course_platform/" +
                             "courseMaterial/"+courseMaterial.getCourseId()+"/materialType/"+courseMaterial.getMaterialType(), file);
@@ -99,7 +101,35 @@ public class CourseMaterialController extends BaseController
             ajax.put("fileName", fileName);
             ajax.put("newFileName", FileUtils.getName(fileName));
             ajax.put("originalFilename", file.getOriginalFilename());
-            ajax.put("insertResult",courseMaterialService.insertCourseMaterial(courseMaterial));
+            if(isValid){
+                ajax.put("insertResult",courseMaterialService.insertCourseMaterial(courseMaterial));
+            }else{
+                ajax.put("insertResult",courseMaterialService.updateCourseMaterial(courseMaterial));
+            }
+            return ajax;
+
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+    @PreAuthorize("@ss.hasPermi('system:material:add')")
+    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
+    @PostMapping("/uploadFiles")
+    public AjaxResult add(MultipartFile file,String path)
+    {
+        try
+        {
+            String fileName = FileUploadUtils.upload(
+                    "E:/IdeaProjects/Intelligent_course_platform/" +
+                            path, file);
+            String url = serverConfig.getUrl() + fileName;
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("url", url);
+            ajax.put("fileName", fileName);
+            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("originalFilename", file.getOriginalFilename());
             return ajax;
         }
         catch (Exception e)

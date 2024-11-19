@@ -118,6 +118,18 @@ export const constantRoutes = [
         meta: { title: "文件资料" }
       },
       {
+        path:"/courseDetail/:courseId/homeworkCorrection/:homeworkId",
+        name:"HomeworkCorrection",
+        component: () => import('@/views/system/courses/homeworkCorrection.vue'),
+        meta: { title: "作业批改" }
+      },
+      {
+        path:"/courseDetail/:courseId/courseHomework/:homeworkId",
+        name:"HomeworkDetail",
+        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        meta: { title: "作业详情" }
+      },
+      {
         path: "/courseDetail/:courseId/courseVideos",
         name: "Videos",
         component: () => import('@/views/system/courses/courseVideos.vue'),
