@@ -149,8 +149,26 @@ export const constantRoutes = [
       }
     ]
   },
-
-
+  {
+    path: '/discussion',
+    name: 'Discussion',
+    component: Layout,
+    meta: { title: "讨论区" },
+    children: [
+      {
+        path: "/discussion",
+        name: "Discussion",
+        component: () => import('@/views/system/discussion/discussion.vue'),
+        meta: { title: "讨论区" }
+      },
+      {
+        path: "/discussion/:postId",
+        name: "Post",
+        component: () => import('@/views/system/discussion/post.vue'),
+        meta: { title: "帖子详情" }
+      },
+    ]
+  },
   {
     path: '/user',
     component: Layout,
