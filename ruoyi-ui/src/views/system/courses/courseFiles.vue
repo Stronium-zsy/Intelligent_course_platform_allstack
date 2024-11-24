@@ -142,7 +142,7 @@ export default {
         this.selectedFile = null;
       } else {
         // 如果点击的是文件，展示文件预览功能
-        this.selectedFile = data.path;
+        this.selectedFile = "/"+data.path;
         this.selectedFolder = null;
       }
     },

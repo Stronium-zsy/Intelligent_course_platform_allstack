@@ -11,10 +11,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="description"    column="description"    />
         <result property="dueDate"    column="due_date"    />
         <result property="createdAt"    column="created_at"    />
+        <result property="filePath"    column="file_path"/>
     </resultMap>
 
     <sql id="selectCourseHomeworkVo">
-        select homework_id, course_id, title, description, due_date, created_at from course_homework
+        select homework_id, course_id, title, description, due_date, created_at,file_path from course_homework
     </sql>
 
     <select id="selectCourseHomeworkList" parameterType="CourseHomework" resultMap="CourseHomeworkResult">
@@ -25,6 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null  and description != ''"> and description = #{description}</if>
             <if test="dueDate != null "> and due_date = #{dueDate}</if>
             <if test="createdAt != null "> and created_at = #{createdAt}</if>
+             <if test="homeworkId !=null">and homework_id = #{homeworkId}</if>
         </where>
     </select>
     
@@ -59,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="description != null">description = #{description},</if>
             <if test="dueDate != null">due_date = #{dueDate},</if>
             <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="filePath !=null">file_path=#{filePath}</if>
         </trim>
         where homework_id = #{homeworkId}
     </update>

@@ -1,7 +1,7 @@
 <template>
   <div class="register">
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
-      <h3 class="title">若依后台管理系统</h3>
+      <h3 class="title">注册</h3>
       <el-form-item prop="username">
         <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -61,7 +61,12 @@
     </el-form>
     <!--  底部  -->
     <div class="el-register-footer">
-      <span>Copyright © 2018-2024 ruoyi.vip All Rights Reserved.</span>
+      <span>
+        管理员邮箱: zsiyu1725@gmail.com
+      </span>
+      <span>
+        管理员保留网站所有权利 未经允许不得镜像，复制 ICP备: 京ICP备2024085810号
+      </span>
     </div>
   </div>
 </template>
@@ -152,7 +157,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
+  background:linear-gradient(to right bottom,#9B24A6,#3282F6);
   background-size: cover;
 }
 .title {
@@ -166,6 +171,7 @@ export default {
   background: #ffffff;
   width: 400px;
   padding: 25px 25px 5px 25px;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.25);
   .el-input {
     height: 38px;
     input {
@@ -193,7 +199,7 @@ export default {
   }
 }
 .el-register-footer {
-  height: 40px;
+  height: 60px;
   line-height: 40px;
   position: fixed;
   bottom: 0;
@@ -203,6 +209,13 @@ export default {
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  span{
+    height:30px;
+    top:0;
+    bottom:5px;
+  }
 }
 .register-code-img {
   height: 38px;

@@ -75,8 +75,7 @@ public class HomeworkSubmissionsController extends BaseController
         {
             Boolean isValid = homeworkSubmissionsService.selectHomeworkSubmissionsList(homeworkSubmissions).stream().noneMatch(hs -> hs.getHomeworkId().equals(homeworkSubmissions.getHomeworkId()) && hs.getUserId().equals(homeworkSubmissions.getUserId()));
             String fileName = FileUploadUtils.upload(
-                    "E:/IdeaProjects/Intelligent_course_platform/" +
-                            "course_homework/"+homeworkSubmissions.getCourseId()+"/"+"homework/"+homeworkSubmissions.getHomeworkId()+"/user/"+homeworkSubmissions.getUserId(), file);
+                            "courseHomework/"+homeworkSubmissions.getCourseId()+"/"+"homework/"+homeworkSubmissions.getHomeworkId()+"/user/"+homeworkSubmissions.getUserId(), file);
             homeworkSubmissions.setFilePath(fileName);
             String url = serverConfig.getUrl() + fileName;
             AjaxResult ajax = AjaxResult.success();

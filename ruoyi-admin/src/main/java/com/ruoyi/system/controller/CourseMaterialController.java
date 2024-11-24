@@ -7,6 +7,7 @@ import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
 import com.ruoyi.framework.config.ServerConfig;
 import com.ruoyi.system.domain.HomeworkSubmissions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,9 @@ public class CourseMaterialController extends BaseController
 
     @Autowired
     private ServerConfig serverConfig;
+
+    @Value("${ruoyi.profile}")
+    private String uploadPath;
 
     /**
      * 查询【请填写功能名称】列表
@@ -91,8 +95,8 @@ public class CourseMaterialController extends BaseController
             Boolean isValid= courseMaterialService.selectCourseMaterialList(courseMaterial).stream().noneMatch(c->(c.getCourseId()==courseMaterial.getCourseId()&&c.getMaterialType().equals(courseMaterial.getMaterialType())));
             System.out.println(isValid);
             String fileName = FileUploadUtils.upload(
-                    "E:/IdeaProjects/Intelligent_course_platform/" +
-                            "courseMaterial/"+courseMaterial.getCourseId()+"/materialType/"+courseMaterial.getMaterialType(), file);
+                            uploadPath+
+                            "/courseMaterial/"+courseMaterial.getCourseId()+"/materialType/"+courseMaterial.getMaterialType(), file);
             courseMaterial.setFilePath(fileName);
             courseMaterial.setTitle(FileUtils.getName(fileName));
             String url = serverConfig.getUrl() + fileName;

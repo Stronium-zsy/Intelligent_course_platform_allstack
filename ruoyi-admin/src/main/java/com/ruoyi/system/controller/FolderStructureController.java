@@ -59,7 +59,7 @@ public class FolderStructureController extends BaseController {
                 return AjaxResult.error("无访问权限");
             }
 
-            String requestPath = "E:\\IdeaProjects\\Intelligent_course_platform\\courseMaterial\\"+courseId+"\\materialType\\courseFiles";
+            String requestPath = "courseMaterial/"+courseId+"/materialType/courseFiles";
 
             // 5. 检查目录是否存在
             File baseDir = new File(requestPath);
@@ -82,27 +82,9 @@ public class FolderStructureController extends BaseController {
 
 
 
-    /**
-     * 递归获取文件夹结构
-     */
     public static List<FileNode> getStructure(File directory, String basePath) {
         List<FileNode> nodes = new ArrayList<>();
         File[] files = directory.listFiles();
-
-        // 打印当前目录和文件列表
-        System.out.println("Processing directory: " + directory.getAbsolutePath());
-        if (files != null) {
-            System.out.println("Found files:");
-            for (File file : files) {
-                // 打印每个文件的信息
-                System.out.println("  - " + file.getName() + (file.isDirectory() ? " [D]" : " [F]"));
-            }
-        } else {
-            System.out.println("No files found or cannot read the directory.");
-        }
-
-        // 打印 basePath
-        System.out.println("Base path: " + basePath);
 
         if (files != null) {
             for (File file : files) {
@@ -115,21 +97,16 @@ public class FolderStructureController extends BaseController {
                 node.setName(file.getName());
                 node.setDirectory(file.isDirectory());
 
-                // 计算相对路径
-                String relativePath = Paths.get(basePath)
+                // 使用绝对路径确保一致性
+                String relativePath = Paths.get(directory.getAbsolutePath())
                         .relativize(Paths.get(file.getAbsolutePath()))
-                        .toString();
-                if(file.isDirectory()){
-                    node.setPath((basePath+"\\"+relativePath).substring("E:\\IdeaProjects\\Intelligent_course_platform".length()));
-                }else{
-                    node.setPath((basePath + "\\" + file.getName()).substring("E:\\IdeaProjects\\Intelligent_course_platform".length()));
-                }
-
+                        .toString()
+                        .replace("\\", "/"); // 替换路径分隔符以保持一致性
+                node.setPath(basePath + "/" + relativePath);
 
                 // 如果是目录，递归获取子文件夹结构
                 if (file.isDirectory()) {
-                    System.out.println("Entering directory: " + file.getAbsolutePath());
-                    List<FileNode> children = getStructure(file, basePath + "\\" + file.getName());
+                    List<FileNode> children = getStructure(file, basePath + "/" + file.getName());
                     node.setChildren(children);
                 } else {
                     // 如果是文件，设置文件大小
@@ -139,9 +116,9 @@ public class FolderStructureController extends BaseController {
                 nodes.add(node);
             }
         }
-
         return nodes;
     }
+
     public static void printStructure(List<FileNode> nodes, int depth) {
         for (FileNode node : nodes) {
             // 打印缩进结构

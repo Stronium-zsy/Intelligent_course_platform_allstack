@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request from '../../../../../Intelligent_course_platform/ruoyi-ui/src/utils/request'
 
 // 查询【请填写功能名称】列表
 export function listMaterial(query) {

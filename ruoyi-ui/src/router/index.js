@@ -81,16 +81,10 @@ export const constantRoutes = [
     component: () => import('@/views/system/courses/courseDetail.vue'),
     children: [
       {
-        path: "/courseDetail/:courseId/overview",
-        name: "Overview",
-        component: () => import('@/views/system/courses/courseOverview.vue'),
-        meta: { title: "课程介绍" }
-      },
-      {
         path: "/courseDetail/:courseId/courseHomework/:homeworkId",
         name: "Overview",
         hidden: true,
-        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        component: () => import('@/views/system/homework/homeworkDetail.vue'),
         meta: { title: "作业详情" }
       },
       {
@@ -120,31 +114,37 @@ export const constantRoutes = [
       {
         path:"/courseDetail/:courseId/homeworkCorrection/:homeworkId",
         name:"HomeworkCorrection",
-        component: () => import('@/views/system/courses/homeworkCorrection.vue'),
+        component: () => import('@/views/system/homework/homeworkCorrection.vue'),
         meta: { title: "作业批改" }
+      },
+      {
+        path:"/courseDiscussion/:courseId",
+        name:"CourseDiscussion",
+        component: () => import('@/views/system/message/index.vue'),
+        meta: { title: "课程讨论" }
       },
       {
         path:"/courseDetail/:courseId/courseHomework/:homeworkId",
         name:"HomeworkDetail",
-        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        component: () => import('@/views/system/homework/homeworkDetail.vue'),
         meta: { title: "作业详情" }
       },
       {
         path: "/courseDetail/:courseId/courseVideos",
         name: "Videos",
-        component: () => import('@/views/system/courses/courseVideos.vue'),
+        component: () => import('@/views/system/video/index.vue'),
         meta: { title: "视频资料" }
       },
       {
         path: "/courseDetail/:courseId/homework/:Id",
         name: "HomeworkDetail",
-        component: () => import('@/views/system/courses/homeworkDetail.vue'),
+        component: () => import('@/views/system/homework/homeworkDetail.vue'),
         meta: { title: "作业详情" }
       },
       {
         path: "/courseDetail/:courseId/courseHomework",
         name: "Homework",
-        component: () => import('@/views/system/courses/courseHomework.vue'),
+        component: () => import('@/views/system/homework/courseHomework.vue'),
         meta: { title: "课程作业" }
       }
     ]

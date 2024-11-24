@@ -7,7 +7,7 @@ ruoyi:
   # 版权年份
   copyrightYear: 2024
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
-  profile: E:\IdeaProjects\Intelligent_course_platform
+  profile: E:/IdeaProjects/Intelligent_course_platform
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
@@ -20,6 +20,7 @@ server:
   servlet:
     # 应用的访问路径
     context-path: /
+
   tomcat:
     # tomcat的URI编码
     uri-encoding: UTF-8
@@ -44,6 +45,10 @@ user:
     maxRetryCount: 5
     # 密码锁定时间（默认10分钟）
     lockTime: 10
+app:
+  # 存储转码视频的文件夹
+  video-folder: E:\IdeaProjects\Intelligent_course_platform\videos\
+
 
 # Spring配置
 spring:
@@ -56,10 +61,22 @@ spring:
   # 文件上传
   servlet:
     multipart:
+      enabled: true
       # 单个文件大小
-      max-file-size: 10MB
+      max-file-size: -1
       # 设置总上传的文件大小
-      max-request-size: 20MB
+      max-request-size: -1
+      # 临时IO目录
+      location: "${java.io.tmpdir}"
+      # 不延迟解析
+      resolve-lazily: false
+      # 超过1Mb，就IO到临时目录
+      file-size-threshold: 1MB
+  web:
+    resources:
+      static-locations:
+        - "classpath:/static/"
+        - "file:${app.video-folder}" # 把视频文件夹目录，添加到静态资源目录列表
   # 服务模块
   devtools:
     restart:

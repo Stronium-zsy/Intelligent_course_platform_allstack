@@ -40,6 +40,17 @@ public class CourseHomework extends BaseEntity
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date createdAt;
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    private String filePath;
+
+
     public void setHomeworkId(Long homeworkId) 
     {
         this.homeworkId = homeworkId;
@@ -104,6 +115,7 @@ public class CourseHomework extends BaseEntity
             .append("description", getDescription())
             .append("dueDate", getDueDate())
             .append("createdAt", getCreatedAt())
+                .append("filePath", getFilePath())
             .toString();
     }
 }

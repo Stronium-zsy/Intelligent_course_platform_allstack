@@ -2,6 +2,12 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.framework.config.ServerConfig;
+import com.ruoyi.system.domain.HomeworkSubmissions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +26,7 @@ import com.ruoyi.system.domain.CourseHomework;
 import com.ruoyi.system.service.ICourseHomeworkService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 【请填写功能名称】Controller
@@ -33,6 +40,12 @@ public class CourseHomeworkController extends BaseController
 {
     @Autowired
     private ICourseHomeworkService courseHomeworkService;
+
+    @Autowired
+    private ServerConfig serverConfig;
+
+    @Value("${ruoyi.profile}")
+    private String uploadPath;
 
     /**
      * 查询【请填写功能名称】列表
@@ -89,6 +102,39 @@ public class CourseHomeworkController extends BaseController
     public AjaxResult edit(@RequestBody CourseHomework courseHomework)
     {
         return toAjax(courseHomeworkService.updateCourseHomework(courseHomework));
+    }
+
+    @PreAuthorize("@ss.hasPermi('system:submissions:add')")
+    @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
+    @PostMapping("/updateHomework")
+    public AjaxResult uploadFile(MultipartFile file,CourseHomework courseHomework) throws Exception
+    {
+        try
+        {
+            Boolean isValid = courseHomeworkService.selectCourseHomeworkList(courseHomework).stream().noneMatch(hs -> hs.getHomeworkId().equals(courseHomework.getHomeworkId()));
+            String fileName = FileUploadUtils.upload(
+                    uploadPath
+                    + "/homeworks/"+courseHomework.getCourseId()+"/homeworkId/"+courseHomework.getHomeworkId()
+                    , file);
+            String url = serverConfig.getUrl() + fileName;
+            courseHomework.setFilePath(fileName);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("url", url);
+            ajax.put("fileName", fileName);
+            ajax.put("newFileName", FileUtils.getName(fileName));
+            ajax.put("originalFilename", file.getOriginalFilename());
+            System.out.println(courseHomework);
+            if (isValid) {
+                ajax.put("insertResult",courseHomeworkService.insertCourseHomework(courseHomework));
+            }else{
+                ajax.put("updateResult",courseHomeworkService.updateCourseHomework(courseHomework));
+            }
+            return ajax;
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
     }
 
     /**

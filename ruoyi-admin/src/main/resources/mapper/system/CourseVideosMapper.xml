@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CourseVideosMapper">
+    
+    <resultMap type="CourseVideos" id="CourseVideosResult">
+        <result property="id"    column="id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="videoPath"    column="video_path"    />
+        <result property="courseName"    column="course_name"    />
+        <result property="teacherName"    column="teacher_name"    />
+        <result property="classTime"    column="class_time"    />
+    </resultMap>
+
+    <sql id="selectCourseVideosVo">
+        select id, course_id, video_path, course_name, teacher_name, class_time from course_videos
+    </sql>
+
+    <select id="selectCourseVideosList" parameterType="CourseVideos" resultMap="CourseVideosResult">
+        <include refid="selectCourseVideosVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="videoPath != null  and videoPath != ''"> and video_path = #{videoPath}</if>
+            <if test="courseName != null  and courseName != ''"> and course_name like concat('%', #{courseName}, '%')</if>
+            <if test="teacherName != null  and teacherName != ''"> and teacher_name like concat('%', #{teacherName}, '%')</if>
+            <if test="classTime != null "> and class_time = #{classTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseVideosById" parameterType="Long" resultMap="CourseVideosResult">
+        <include refid="selectCourseVideosVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertCourseVideos" parameterType="CourseVideos" useGeneratedKeys="true" keyProperty="id">
+        insert into course_videos
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="videoPath != null and videoPath != ''">video_path,</if>
+            <if test="courseName != null and courseName != ''">course_name,</if>
+            <if test="teacherName != null and teacherName != ''">teacher_name,</if>
+            <if test="classTime != null">class_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="videoPath != null and videoPath != ''">#{videoPath},</if>
+            <if test="courseName != null and courseName != ''">#{courseName},</if>
+            <if test="teacherName != null and teacherName != ''">#{teacherName},</if>
+            <if test="classTime != null">#{classTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourseVideos" parameterType="CourseVideos">
+        update course_videos
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="videoPath != null and videoPath != ''">video_path = #{videoPath},</if>
+            <if test="courseName != null and courseName != ''">course_name = #{courseName},</if>
+            <if test="teacherName != null and teacherName != ''">teacher_name = #{teacherName},</if>
+            <if test="classTime != null">class_time = #{classTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseVideosById" parameterType="Long">
+        delete from course_videos where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseVideosByIds" parameterType="String">
+        delete from course_videos where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

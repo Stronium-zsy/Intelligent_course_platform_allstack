@@ -2,6 +2,8 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.core.redis.RedisCache;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,9 @@ public class CourseUserController extends BaseController
 {
     @Autowired
     private ICourseUserService courseUserService;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 查询【请填写功能名称】列表
@@ -77,6 +82,8 @@ public class CourseUserController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody CourseUser courseUser)
     {
+
+
         return toAjax(courseUserService.insertCourseUser(courseUser));
     }
 
