@@ -7,7 +7,7 @@
       <el-main class="main">
         <el-row :gutter="20">
           <el-col :span="24" v-for="post in posts" :key="post.postId">
-            <router-link :to="`/discussion/${post.postId}`" class="post-link">
+            <router-link :to="`/courseDetail/${courseId}/discussion/${post.postId}`" class="post-link">
               <el-card class="post-card">
                 <div slot="header" class="post-header">
                   <h2 class="post-title">{{ post.title }}</h2>
@@ -45,6 +45,7 @@ export default {
   name: 'DiscussionBoard',
   data() {
     return {
+      courseId: this.$route.params.courseId,
       posts: [
         {
           postId: 1,

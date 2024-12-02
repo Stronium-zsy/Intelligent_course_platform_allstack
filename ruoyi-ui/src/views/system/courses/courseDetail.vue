@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Sidebar from "./courseSideBar.vue";
+import Sidebar from "./courseSidebar.vue";
 
 export default {
   name: "CourseDetail",
