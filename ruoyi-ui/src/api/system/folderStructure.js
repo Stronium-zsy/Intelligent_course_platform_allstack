@@ -1,4 +1,4 @@
-import request from '../../../../../Intelligent_course_platform/ruoyi-ui/src/utils/request'
+import request from '@/utils/request'
 
 export function getFolderStructure(courseId) {
   return request({

@@ -1,5 +1,5 @@
-import request from '../../../../../Intelligent_course_platform/ruoyi-ui/src/utils/request'
-import { parseStrEmpty } from "../../../../../Intelligent_course_platform/ruoyi-ui/src/utils/ruoyi";
+import request from '@/utils/request'
+import { parseStrEmpty } from '@/utils/ruoyi';
 
 // 查询用户列表
 export function listUser(query) {

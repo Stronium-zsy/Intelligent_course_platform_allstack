@@ -1,4 +1,4 @@
-import request from '../../../../../../Intelligent_course_platform/ruoyi-ui/src/utils/request'
+import request from '@/utils/request'
 
 // 查询字典类型列表
 export function listType(query) {
