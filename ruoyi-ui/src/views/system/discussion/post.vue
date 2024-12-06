@@ -1,14 +1,15 @@
 <template>
   <div class="post-detail">
     <el-button class="back-button" icon="el-icon-arrow-left" @click="goBack">返回</el-button>
+
     <!-- 主帖子内容 -->
-    <el-card class="post-card">
+    <el-card v-if="post" class="post-card">
       <div class="post-header">
         <div class="author-info">
-          <el-avatar :size="40" src="/placeholder.svg?height=40&width=40"></el-avatar>
+          <el-avatar :size="40" :src="post.authorAvatar || '/placeholder.svg?height=40&width=40'"></el-avatar>
           <div class="author-meta">
-            <span class="author-name">{{ post.author }}</span>
-            <span class="post-time">{{ post.timeAgo }}</span>
+            <span class="author-name">{{ post.authorName }}</span>
+            <span class="post-time">{{ formatDate(post.postTime) }}</span>
           </div>
         </div>
       </div>
@@ -18,58 +19,67 @@
 
       <div class="post-stats">
         <div class="stat-item">
-          <el-button type="text" @click="handleLike">
+          <el-button type="text" @click="handleLike('post', post.postId)">
             <i class="el-icon-thumb"></i>
-            <span>{{ post.likes }}</span>
+            <span>{{ post.likesCount }} 赞</span>
           </el-button>
         </div>
         <div class="stat-item">
-          <el-button type="text" @click="handleBookmark">
+          <el-button type="text" @click="handleBookmark(post.postId)">
             <i class="el-icon-star-off"></i>
-            <span>{{ post.bookmarks }}</span>
+            <span>{{ post.favoritesCount }} 收藏</span>
           </el-button>
         </div>
       </div>
     </el-card>
 
     <!-- 评论列表 -->
-    <div class="comments-section">
-      <el-card v-for="comment in comments" :key="comment.id" class="comment-card">
+    <div v-if="comments.length > 0" class="comments-section">
+      <h2>评论区</h2>
+      <el-card v-for="comment in comments" :key="comment.commentId" class="comment-card">
         <div class="comment-header">
           <div class="author-info">
-            <el-avatar :size="32" src="/placeholder.svg?height=32&width=32"></el-avatar>
+            <el-avatar :size="32" :src="comment.authorAvatar || '/placeholder.svg?height=32&width=32'"></el-avatar>
             <div class="author-meta">
-              <span class="author-name">{{ comment.author }}</span>
+              <span class="author-name">{{ comment.authorName }}</span>
               <div class="comment-meta">
-                <span class="comment-time">{{ comment.timeAgo }}</span>
-                <span class="comment-number">#{{ comment.number }}</span>
+                <span class="comment-time">{{ formatDate(comment.commentTime) }}</span>
+                <span class="comment-number">#{{ comment.commentIndex }}</span>
               </div>
-              <div class="comment-meta"></div>
             </div>
           </div>
+          <div class="comment-actions">
+            <el-button type="text" @click="likeComment('comment', comment.commentId)">
+              <i class="el-icon-thumb"></i>
+              <span>{{ comment.likesCount }} 赞</span>
+            </el-button>
+            <el-button type="text" @click="showReplyForm(comment.commentId)">回复</el-button>
+          </div>
         </div>
-
         <div class="comment-content">{{ comment.content }}</div>
-
-        <div class="comment-actions">
-          <el-button type="text" @click="likeComment(comment.id)">
-            <i class="el-icon-thumb"></i>
-            <span>{{ comment.likes }}</span>
-          </el-button>
+        <div v-if="replyingTo === comment.commentId" class="reply-form-inline">
+          <el-input
+            type="textarea"
+            :rows="2"
+            v-model="replyForm.content"
+            placeholder="留下你的回复..."
+          ></el-input>
+          <el-button type="primary" @click="submitReply(comment.commentId)">发送</el-button>
         </div>
       </el-card>
     </div>
+    <p v-else>暂无评论</p>
 
     <!-- 回复表单 -->
     <el-card class="reply-form">
-      <h3>评论</h3>
+      <h3>发表评论</h3>
       <el-form :model="replyForm" @submit.native.prevent="submitReply">
         <el-form-item>
           <el-input
-              type="textarea"
-              :rows="4"
-              v-model="replyForm.content"
-              placeholder="留下你的评论..."
+            type="textarea"
+            :rows="4"
+            v-model="replyForm.content"
+            placeholder="留下你的评论..."
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -83,117 +93,137 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import { getPosts } from '@/api/system/posts';
+import { listComments } from '@/api/system/comments';
+import { addComments } from '@/api/system/comments';
+import moment from 'moment';
+
 
 export default {
   name: 'PostDetail',
   data() {
     return {
-      post: {
-        postId: '1',
-        title: 'Vue 3 Composition API: 一个改变游戏规则的特性',
-        author: 'Jane Doe',
-        timeAgo: '2 天前',
-        content: 'Vue 3 的 Composition API 带来了组织组件逻辑的新方式。它允许更好的代码重用和组合。这个 API 提供了一组基于函数的 API，允许灵活地组合组件逻辑。在这篇文章中，我们将探讨如何使用 Composition API 来创建更易于维护和可扩展的 Vue 应用程序。',
-        likes: 42,
-        bookmarks: 15,
-        replies: 3
-      },
-      comments: [
-        {
-          commentId: 1,
-          author: 'John Smith',
-          number: 1,
-          timeAgo: '1 天前',
-          content: '好文章！我最近的项目中一直在使用 Composition API，它确实改善了我的代码组织。你有什么建议可以将较大的 Vue 2 项目迁移到 Vue 3 和 Composition API 吗？',
-          likes: 8
-        },
-        {
-          commentId: 2,
-          author: 'Alice Johnson',
-          number: 2,
-          timeAgo: '20 小时前',
-          content: '我还在适应 Composition API。它很强大，但对于简单的组件，我发现它比 Options API 更冗长。你有什么想法在什么时候使用其中一个吗？',
-          likes: 5
-        },
-        {
-          commentId: 3,
-          author: 'Bob Wilson',
-          number: 3,
-          timeAgo: '10 小时前',
-          content: '感谢这篇信息丰富的文章！我很好奇 Composition API 如何处理代码拆分和懒加载。你已经探索过这个方面了吗？',
-          likes: 3
-        }
-      ],
+      postId: this.$route.params.postId, // 获取路由参数中的帖子ID
+      post: null, // 存储帖子详情
+      comments: [], // 存储评论列表
       replyForm: {
-        content: ''
+        content: '',
+        replyTo: null
       },
-      submitting: false
-    }
+      replyingTo: null, // 当前正在回复的评论ID
+      submitting: false // 表单提交状态
+    };
   },
   created() {
     this.fetchPost();
+    this.fetchComments();
   },
   methods: {
-    async fetchPost() {
+    fetchPost() {
       try {
-        const postId = this.$route.params.postId;
-        const response = await axios.get(`/dev-api/system/discussion/${postId}`);
-        // this.post = response.data['post'];
-        // this.comments = response.data['comments'];
+        getPosts(this.postId).then(
+          response => {
+            // console.log(response);
+            if (response.data) {
+              this.post = response.data;
+              // console.log(this.post);
+            }
+          }
+        );
       } catch (error) {
-        console.error('Failed to fetch course:', error);
+        console.error('Failed to fetch post:', error);
+        this.$message.error('加载帖子失败');
       }
     },
 
-    handleLike() {
-      this.post.likes++
-    },
-    handleBookmark() {
-      this.post.bookmarks++
-    },
-    likeComment(commentId) {
-      const comment = this.comments.find(c => c.id === commentId)
-      if (comment) {
-        comment.likes++
+    fetchComments() {
+  try {
+    listComments({ postId: this.postId }).then(
+      response => {
+        console.log(response);
+        if (response.rows) {
+          this.comments = response.rows;
+          console.log(this.comments);
+        }
       }
+    );
+  } catch (error) {
+    console.error('Failed to fetch comments', error);
+  }
+},
+    handleLike(type, id) {
+      this.updateLikeCount(type, id, 'like');
+    },
+    handleBookmark(id) {
+      this.updateLikeCount('post', id, 'bookmark');
+    },
+    likeComment(type, id) {
+      this.updateLikeCount(type, id, 'like');
     },
     showReplyForm(commentId) {
-      // 实现回复特定评论的逻辑
-      this.replyForm.replyTo = commentId
+      this.replyingTo = commentId;
+      this.replyForm.replyTo = commentId;
+      this.replyForm.content = ''; // 清空回复框内容
     },
-    async submitReply() {
-      if (!this.replyForm.content.trim()) {
-        return
+
+    async submitReply(replyTo = null) {
+  if (!this.replyForm.content.trim()) {
+    return;
+  }
+
+  this.submitting = true;
+  try {
+    const response = await addComments({
+      postId: this.postId,
+      replyTo,
+      content: this.replyForm.content,
+      userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
+      commentIndex: this.comments.length + 1 // 设置评论索引
+    });
+
+    // 假设服务器返回了新的评论对象
+    const newComment = response.data;
+    newComment.commentIndex = this.comments.length + 1;
+
+    this.comments.push(newComment);
+    this.replyForm.content = '';
+    this.replyingTo = null;
+    this.$message.success('回复提交成功！');
+  } catch (error) {
+    console.error('Failed to submit reply:', error);
+    this.$message.error('回复提交失败');
+  } finally {
+    this.submitting = false;
+  }
+},
+
+    updateLikeCount(type, id, action) {
+      let target;
+      if (type === 'post') {
+        target = this.post;
+      } else if (type === 'comment') {
+        target = this.comments.find(c => c.commentId === id);
       }
 
-      this.submitting = true
-      try {
-        // 模拟API调用
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        this.comments.push({
-          id: this.comments.length + 1,
-          author: '当前用户',
-          number: this.comments.length + 1,
-          timeAgo: '刚刚',
-          content: this.replyForm.content,
-          likes: 0
-        })
-
-        this.replyForm.content = ''
-        this.$message.success('回复提交成功！')
-      } catch (error) {
-        this.$message.error('回复提交失败')
-      } finally {
-        this.submitting = false
+      if (target) {
+        if (action === 'like') {
+          target.likesCount++;
+        } else if (action === 'bookmark') {
+          target.favoritesCount++;
+        }
+        // 这里应该有实际的API调用来更新服务器上的点赞或收藏状态
+        // 例如：axios.post('/api/like', { id, action, type });
       }
     },
     goBack() {
-      this.$router.go(-1)
+      this.$router.go(-1);
+    },
+    formatDate(date) {
+      return moment(date).fromNow();
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -201,14 +231,24 @@ export default {
   width: 80%;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f5f5f5;
 }
 
 .post-card {
   margin-bottom: 24px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
 }
 
 .post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
 }
 
 .author-info {
@@ -236,12 +276,14 @@ export default {
   font-size: 28px;
   font-weight: bold;
   margin: 16px 0;
+  color: #333;
 }
 
 .post-content {
   font-size: 16px;
   line-height: 1.6;
   margin-bottom: 24px;
+  color: #666;
 }
 
 .post-stats {
@@ -260,13 +302,22 @@ export default {
 
 .comments-section {
   margin-bottom: 24px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
 }
 
 .comment-card {
   margin-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 16px;
 }
 
 .comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
 }
 
@@ -281,6 +332,7 @@ export default {
   font-size: 15px;
   line-height: 1.5;
   margin-bottom: 12px;
+  color: #666;
 }
 
 .comment-actions {
@@ -290,15 +342,31 @@ export default {
 
 .reply-form {
   margin-top: 24px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
 }
 
 .reply-form h3 {
   margin-bottom: 16px;
   font-size: 18px;
   font-weight: 600;
+  color: #333;
 }
 
 .back-button {
   margin-bottom: 20px;
+  background-color: transparent;
+  border: none;
+  color: #0057e7;
+  font-size: 16px;
+}
+
+.reply-form-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
 }
 </style>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PostsMapper">
+    
+    <resultMap type="Posts" id="PostsResult">
+        <result property="postId"    column="post_id"    />
+        <result property="courseId"    column="course_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="title"    column="title"    />
+        <result property="authorName"    column="author_name"    />
+        <result property="content"    column="content"    />
+        <result property="postTime"    column="post_time"    />
+        <result property="likesCount"    column="likes_count"    />
+        <result property="favoritesCount"    column="favorites_count"    />
+    </resultMap>
+
+    <sql id="selectPostsVo">
+        select post_id, course_id, user_id, title, author_name, content, post_time, likes_count, favorites_count from posts
+    </sql>
+
+    <select id="selectPostsList" parameterType="Posts" resultMap="PostsResult">
+        <include refid="selectPostsVo"/>
+        <where>  
+            <if test="courseId != null "> and course_id = #{courseId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="authorName != null  and authorName != ''"> and author_name like concat('%', #{authorName}, '%')</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="postTime != null "> and post_time = #{postTime}</if>
+            <if test="likesCount != null "> and likes_count = #{likesCount}</if>
+            <if test="favoritesCount != null "> and favorites_count = #{favoritesCount}</if>
+        </where>
+    </select>
+    
+    <select id="selectPostsByPostId" parameterType="Long" resultMap="PostsResult">
+        <include refid="selectPostsVo"/>
+        where post_id = #{postId}
+    </select>
+
+    <insert id="insertPosts" parameterType="Posts" useGeneratedKeys="true" keyProperty="postId">
+        insert into posts
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="authorName != null and authorName != ''">author_name,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="postTime != null">post_time,</if>
+            <if test="likesCount != null">likes_count,</if>
+            <if test="favoritesCount != null">favorites_count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="authorName != null and authorName != ''">#{authorName},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="postTime != null">#{postTime},</if>
+            <if test="likesCount != null">#{likesCount},</if>
+            <if test="favoritesCount != null">#{favoritesCount},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePosts" parameterType="Posts">
+        update posts
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="authorName != null and authorName != ''">author_name = #{authorName},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="postTime != null">post_time = #{postTime},</if>
+            <if test="likesCount != null">likes_count = #{likesCount},</if>
+            <if test="favoritesCount != null">favorites_count = #{favoritesCount},</if>
+        </trim>
+        where post_id = #{postId}
+    </update>
+
+    <delete id="deletePostsByPostId" parameterType="Long">
+        delete from posts where post_id = #{postId}
+    </delete>
+
+    <delete id="deletePostsByPostIds" parameterType="String">
+        delete from posts where post_id in 
+        <foreach item="postId" collection="array" open="(" separator="," close=")">
+            #{postId}
+        </foreach>
+    </delete>
+</mapper>

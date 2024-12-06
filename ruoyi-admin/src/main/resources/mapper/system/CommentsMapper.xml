@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.CommentsMapper">
+    
+    <resultMap type="Comments" id="CommentsResult">
+        <result property="commentId"    column="comment_id"    />
+        <result property="postId"    column="post_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="commentIndex"    column="comment_index"    />
+        <result property="authorName"    column="author_name"    />
+        <result property="content"    column="content"    />
+        <result property="commentTime"    column="comment_time"    />
+        <result property="likesCount"    column="likes_count"    />
+        <result property="favoritesCount"    column="favorites_count"    />
+    </resultMap>
+
+    <sql id="selectCommentsVo">
+        select comment_id, post_id, user_id, comment_index, author_name, content, comment_time, likes_count, favorites_count from comments
+    </sql>
+
+    <select id="selectCommentsList" parameterType="Comments" resultMap="CommentsResult">
+        <include refid="selectCommentsVo"/>
+        <where>  
+            <if test="postId != null "> and post_id = #{postId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="commentIndex != null "> and comment_index = #{commentIndex}</if>
+            <if test="authorName != null  and authorName != ''"> and author_name like concat('%', #{authorName}, '%')</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="commentTime != null "> and comment_time = #{commentTime}</if>
+            <if test="likesCount != null "> and likes_count = #{likesCount}</if>
+            <if test="favoritesCount != null "> and favorites_count = #{favoritesCount}</if>
+        </where>
+    </select>
+    
+    <select id="selectCommentsByCommentId" parameterType="Long" resultMap="CommentsResult">
+        <include refid="selectCommentsVo"/>
+        where comment_id = #{commentId}
+    </select>
+
+    <insert id="insertComments" parameterType="Comments" useGeneratedKeys="true" keyProperty="commentId">
+        insert into comments
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postId != null">post_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="commentIndex != null">comment_index,</if>
+            <if test="authorName != null and authorName != ''">author_name,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="commentTime != null">comment_time,</if>
+            <if test="likesCount != null">likes_count,</if>
+            <if test="favoritesCount != null">favorites_count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postId != null">#{postId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="commentIndex != null">#{commentIndex},</if>
+            <if test="authorName != null and authorName != ''">#{authorName},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="commentTime != null">#{commentTime},</if>
+            <if test="likesCount != null">#{likesCount},</if>
+            <if test="favoritesCount != null">#{favoritesCount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComments" parameterType="Comments">
+        update comments
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="postId != null">post_id = #{postId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="commentIndex != null">comment_index = #{commentIndex},</if>
+            <if test="authorName != null and authorName != ''">author_name = #{authorName},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="commentTime != null">comment_time = #{commentTime},</if>
+            <if test="likesCount != null">likes_count = #{likesCount},</if>
+            <if test="favoritesCount != null">favorites_count = #{favoritesCount},</if>
+        </trim>
+        where comment_id = #{commentId}
+    </update>
+
+    <delete id="deleteCommentsByCommentId" parameterType="Long">
+        delete from comments where comment_id = #{commentId}
+    </delete>
+
+    <delete id="deleteCommentsByCommentIds" parameterType="String">
+        delete from comments where comment_id in 
+        <foreach item="commentId" collection="array" open="(" separator="," close=")">
+            #{commentId}
+        </foreach>
+    </delete>
+</mapper>
