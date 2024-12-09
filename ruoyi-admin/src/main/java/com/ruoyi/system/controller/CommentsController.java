@@ -75,11 +75,15 @@ public class CommentsController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:comments:add')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody Comments comments)
-    {
-        return toAjax(commentsService.insertComments(comments));
+public AjaxResult add(@RequestBody Comments comments)
+{
+    int result = commentsService.insertComments(comments);
+    if (result > 0) {
+        return AjaxResult.success("评论添加成功", comments);
+    } else {
+        return AjaxResult.error("评论添加失败");
     }
-
+}
     /**
      * 修改【请填写功能名称】
      */

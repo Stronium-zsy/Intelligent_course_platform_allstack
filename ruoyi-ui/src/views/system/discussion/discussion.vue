@@ -1,80 +1,137 @@
 <template>
-<div class="discussion-board">
-<el-container>
-  <el-header class="header">
-    <h1 class="title">讨论板</h1>
-  </el-header>
-  <el-main class="main">
-    <el-row :gutter="20">
-      <el-col :span="24" v-for="post in posts" :key="post.postId">
-        <router-link :to="`/courseDetail/${courseId}/discussion/${post.postId}`" class="post-link">
-          <el-card class="post-card">
-            <div slot="header" class="post-header">
-              <h2 class="post-title">{{ post.title }}</h2>
-              <span class="post-time">
-                    <i class="el-icon-time"></i>
-                    {{ formatDate(post.postTime) }}
-                  </span>
+  <div class="discussion-board">
+    <el-container>
+      <el-header class="header">
+        <h1 class="title">讨论板</h1>
+      </el-header>
+      <el-main class="main">
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <div class="posts-list">
+              <el-card v-for="post in posts" :key="post.postId" class="post-card">
+                <router-link :to="`/courseDetail/${courseId}/discussion/${post.postId}`" class="post-link">
+                  <div slot="header" class="post-header">
+                    <h2 class="post-title">{{ post.title }}</h2>
+                    <span class="post-time">
+                      <i class="el-icon-time"></i>
+                      {{ formatDate(post.postTime) }}
+                    </span>
+                  </div>
+                  <div class="post-content">
+                    <p>{{ post.title }}</p> <!-- 修改为显示标题 -->
+                  </div>
+                  <div class="post-footer">
+                    <div class="post-author">
+                      <i class="el-icon-user"></i>
+                      <span> {{ post.authorName }}</span>
+                    </div>
+                    <div class="post-stats">
+                      <span><i class="el-icon-thumb"></i> {{ post.likesCount }} 赞</span>
+                      <span><i class="el-icon-star-on"></i> {{ post.favoritesCount }} 收藏</span>
+                    </div>
+                    <el-button type="text" class="read-more">
+                      阅读更多
+                      <i class="el-icon-arrow-right"></i>
+                    </el-button>
+                  </div>
+                </router-link>
+              </el-card>
             </div>
-            <div class="post-content">
-              <p>{{ post.content }}</p>
-            </div>
-            <div class="post-footer">
-              <div class="post-author">
-                <i class="el-icon-user"></i>
-                <span> {{ post.authorName }}</span>
-              </div>
-              <div class="post-stats">
-                <span><i class="el-icon-thumb"></i> {{ post.likesCount }} 赞</span>
-                <span><i class="el-icon-star-on"></i> {{ post.favoritesCount }} 收藏</span>
-              </div>
-              <el-button type="text" class="read-more">
-                阅读更多
-                <i class="el-icon-arrow-right"></i>
-              </el-button>
-            </div>
-          </el-card>
-        </router-link>
-      </el-col>
-    </el-row>
-  </el-main>
-</el-container>
-</div>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-card class="new-post-card">
+              <h2>发新帖</h2>
+              <el-form :model="newPost" @submit.native.prevent="submitPost">
+                <el-form-item label="标题">
+                  <el-input v-model="newPost.title"></el-input>
+                </el-form-item>
+                <el-form-item label="内容">
+                  <el-input type="textarea" v-model="newPost.content"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" native-type="submit" :loading="submitting">提交</el-button>
+                </el-form-item>
+              </el-form>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
-import {listPosts} from "@/api/system/posts";
+import { listPosts, addPosts } from "@/api/system/posts";
 
 export default {
   name: 'DiscussionBoard',
   data() {
     return {
       courseId: this.$route.params.courseId,
-      posts: []
+      posts: [],
+      newPost: {
+        title: '',
+        content: ''
+      },
+      submitting: false // 表单提交状态
     }
   },
   created() {
     this.fetchDiscussion();
   },
-
   methods: {
     fetchDiscussion() {
       try {
-        listPosts().then(
+        listPosts({ pageNum: 1, pageSize: 99999 }).then(
           response => {
-            console.log(response)
             if (response.rows) {
               this.posts = response.rows;
-
-              console.log(this.posts)
             }
           }
-        ) // 使用await等待异步操作完成
-      } catch(error) {
+        );
+      } catch (error) {
         console.error('Failed to fetch discussion posts', error);
       }
     },
+   async submitPost() {
+  if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
+    this.$message.error('标题和内容不能为空');
+    return;
+  }
+
+  this.submitting = true;
+  try {
+    const response = await addPosts({
+      courseId: this.courseId,
+      title: this.newPost.title,
+      content: this.newPost.content,
+      userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
+      authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
+    });
+
+
+
+
+    // 确保服务器返回了新的帖子对象
+    if (response) {
+      this.newPost.title = '';
+      this.newPost.content = '';
+      this.$message.success('帖子发送成功！');
+      this.fetchDiscussion(); // 重新获取帖子列表
+    } else {
+      this.$message.error('帖子发布失败');
+    }
+
+  } catch (error) {
+    console.error('Failed to submit post:', error);
+    this.$message.error('帖子发布失败');
+  } finally {
+    this.submitting = false;
+  }
+},
     formatDate(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleString(); // 将ISO格式的时间字符串转换为本地时间字符串
@@ -82,10 +139,6 @@ export default {
   }
 }
 </script>
-
-
-
-
 
 <style scoped>
 .discussion-board {
@@ -114,6 +167,15 @@ export default {
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+}
+
+.new-post-card {
+  margin-bottom: 2rem;
+}
+
+.posts-list {
+  max-height: 600px; /* 设置最大高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 
 .post-card {

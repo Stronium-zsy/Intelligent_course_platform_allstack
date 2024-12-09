@@ -19,7 +19,7 @@
 
       <div class="post-stats">
         <div class="stat-item">
-          <el-button type="text" @click="handleLike('post', post.postId)">
+          <el-button type="text" @click="likePost(post.postId)">
             <i class="el-icon-thumb"></i>
             <span>{{ post.likesCount }} 赞</span>
           </el-button>
@@ -36,37 +36,39 @@
     <!-- 评论列表 -->
     <div v-if="comments.length > 0" class="comments-section">
       <h2>评论区</h2>
-      <el-card v-for="comment in comments" :key="comment.commentId" class="comment-card">
-        <div class="comment-header">
-          <div class="author-info">
-            <el-avatar :size="32" :src="comment.authorAvatar || '/placeholder.svg?height=32&width=32'"></el-avatar>
-            <div class="author-meta">
-              <span class="author-name">{{ comment.authorName }}</span>
-              <div class="comment-meta">
-                <span class="comment-time">{{ formatDate(comment.commentTime) }}</span>
-                <span class="comment-number">#{{ comment.commentIndex }}</span>
+      <div class="comments-list">
+        <el-card v-for="comment in comments" :key="comment.commentId" class="comment-card">
+          <div class="comment-header">
+            <div class="author-info">
+              <el-avatar :size="32" :src="comment.authorAvatar || '/placeholder.svg?height=32&width=32'"></el-avatar>
+              <div class="author-meta">
+                <span class="author-name">{{ comment.authorName }}</span>
+                <div class="comment-meta">
+                  <span class="comment-time">{{ formatDate(comment.commentTime) }}</span>
+                  <span class="comment-number">#{{ comment.commentIndex }}</span>
+                </div>
               </div>
             </div>
+            <div class="comment-actions">
+              <el-button type="text" @click="likeComment(comment.commentId)">
+                <i class="el-icon-thumb"></i>
+                <span>{{ comment.likesCount }} 赞</span>
+              </el-button>
+              <el-button type="text" @click="showReplyForm(comment.commentId)">回复</el-button>
+            </div>
           </div>
-          <div class="comment-actions">
-            <el-button type="text" @click="likeComment('comment', comment.commentId)">
-              <i class="el-icon-thumb"></i>
-              <span>{{ comment.likesCount }} 赞</span>
-            </el-button>
-            <el-button type="text" @click="showReplyForm(comment.commentId)">回复</el-button>
+          <div class="comment-content">{{ comment.content }}</div>
+          <div v-if="replyingTo === comment.commentId" class="reply-form-inline">
+            <el-input
+              type="textarea"
+              :rows="2"
+              v-model="replyForm.content"
+              placeholder="留下你的回复..."
+            ></el-input>
+            <el-button type="primary" @click="submitReply(comment.commentId)">发送</el-button>
           </div>
-        </div>
-        <div class="comment-content">{{ comment.content }}</div>
-        <div v-if="replyingTo === comment.commentId" class="reply-form-inline">
-          <el-input
-            type="textarea"
-            :rows="2"
-            v-model="replyForm.content"
-            placeholder="留下你的回复..."
-          ></el-input>
-          <el-button type="primary" @click="submitReply(comment.commentId)">发送</el-button>
-        </div>
-      </el-card>
+        </el-card>
+      </div>
     </div>
     <p v-else>暂无评论</p>
 
@@ -94,11 +96,10 @@
 
 <script>
 import axios from 'axios';
-import { getPosts } from '@/api/system/posts';
-import { listComments } from '@/api/system/comments';
+import { getPosts, updatePosts } from '@/api/system/posts';
+import { listComments, updateComments } from '@/api/system/comments';
 import { addComments } from '@/api/system/comments';
 import moment from 'moment';
-
 
 export default {
   name: 'PostDetail',
@@ -112,7 +113,8 @@ export default {
         replyTo: null
       },
       replyingTo: null, // 当前正在回复的评论ID
-      submitting: false // 表单提交状态
+      submitting: false, // 表单提交状态
+      likedComments: [] // 存储已点赞的评论ID
     };
   },
   created() {
@@ -124,10 +126,8 @@ export default {
       try {
         getPosts(this.postId).then(
           response => {
-            // console.log(response);
             if (response.data) {
               this.post = response.data;
-              // console.log(this.post);
             }
           }
         );
@@ -138,28 +138,46 @@ export default {
     },
 
     fetchComments() {
-  try {
-    listComments({ postId: this.postId }).then(
-      response => {
-        console.log(response);
-        if (response.rows) {
-          this.comments = response.rows;
-          console.log(this.comments);
-        }
+      try {
+        listComments({ postId: this.postId }).then(
+          response => {
+            if (response.rows) {
+              this.comments = response.rows;
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Failed to fetch comments', error);
       }
-    );
-  } catch (error) {
-    console.error('Failed to fetch comments', error);
-  }
-},
-    handleLike(type, id) {
-      this.updateLikeCount(type, id, 'like');
     },
-    handleBookmark(id) {
-      this.updateLikeCount('post', id, 'bookmark');
+    async likePost(postId) {
+      try {
+        const response = await updatePosts({ postId, likesCount: this.post.likesCount + 1 });
+        if (response) {
+          this.fetchPost(); // 重新获取帖子数据
+          this.$message.success('点赞成功');
+        } else {
+          this.$message.error('点赞失败');
+        }
+      } catch (error) {
+        console.error('Failed to like post:', error);
+        this.$message.error('点赞失败');
+      }
     },
-    likeComment(type, id) {
-      this.updateLikeCount(type, id, 'like');
+    async likeComment(commentId) {
+      try {
+        const comment = this.comments.find(c => c.commentId === commentId);
+        const response = await updateComments({ commentId, likesCount: comment.likesCount + 1 });
+        if (response) {
+          this.fetchComments(); // 重新获取评论数据
+          this.$message.success('点赞成功');
+        } else {
+          this.$message.error('点赞失败');
+        }
+      } catch (error) {
+        console.error('Failed to like comment:', error);
+        this.$message.error('点赞失败');
+      }
     },
     showReplyForm(commentId) {
       this.replyingTo = commentId;
@@ -168,52 +186,35 @@ export default {
     },
 
     async submitReply(replyTo = null) {
-  if (!this.replyForm.content.trim()) {
-    return;
-  }
-
-  this.submitting = true;
-  try {
-    const response = await addComments({
-      postId: this.postId,
-      replyTo,
-      content: this.replyForm.content,
-      userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
-      commentIndex: this.comments.length + 1 // 设置评论索引
-    });
-
-    // 假设服务器返回了新的评论对象
-    const newComment = response.data;
-    newComment.commentIndex = this.comments.length + 1;
-
-    this.comments.push(newComment);
-    this.replyForm.content = '';
-    this.replyingTo = null;
-    this.$message.success('回复提交成功！');
-  } catch (error) {
-    console.error('Failed to submit reply:', error);
-    this.$message.error('回复提交失败');
-  } finally {
-    this.submitting = false;
-  }
-},
-
-    updateLikeCount(type, id, action) {
-      let target;
-      if (type === 'post') {
-        target = this.post;
-      } else if (type === 'comment') {
-        target = this.comments.find(c => c.commentId === id);
+      if (!this.replyForm.content.trim()) {
+        return;
       }
 
-      if (target) {
-        if (action === 'like') {
-          target.likesCount++;
-        } else if (action === 'bookmark') {
-          target.favoritesCount++;
+      this.submitting = true;
+      try {
+        const response = await addComments({
+          postId: this.postId,
+          replyTo,
+          content: this.replyForm.content,
+          userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
+          commentIndex: this.comments.length + 1, // 设置评论索引
+          authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
+        });
+
+        // 确保服务器返回了新的评论对象
+        if (response && response.data) {
+          this.replyForm.content = '';
+          this.replyingTo = null;
+          this.$message.success('回复提交成功！');
+          this.fetchComments(); // 重新获取评论列表
+        } else {
+          throw new Error('Invalid response from server');
         }
-        // 这里应该有实际的API调用来更新服务器上的点赞或收藏状态
-        // 例如：axios.post('/api/like', { id, action, type });
+      } catch (error) {
+        console.error('Failed to submit reply:', error);
+        this.$message.error('回复提交失败');
+      } finally {
+        this.submitting = false;
       }
     },
     goBack() {
@@ -306,6 +307,11 @@ export default {
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+}
+
+.comments-list {
+  max-height: 400px; /* 设置最大高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 
 .comment-card {

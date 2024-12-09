@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询【请填写功能名称】列表
+// 查询帖子列表
 export function listPosts(query) {
   return request({
     url: '/system/posts/list',
@@ -9,7 +9,7 @@ export function listPosts(query) {
   })
 }
 
-// 查询【请填写功能名称】详细
+// 查询帖子详细
 export function getPosts(postId) {
   return request({
     url: '/system/posts/' + postId,
@@ -17,7 +17,7 @@ export function getPosts(postId) {
   })
 }
 
-// 新增【请填写功能名称】
+// 新增帖子
 export function addPosts(data) {
   return request({
     url: '/system/posts',
@@ -26,7 +26,7 @@ export function addPosts(data) {
   })
 }
 
-// 修改【请填写功能名称】
+// 修改帖子
 export function updatePosts(data) {
   return request({
     url: '/system/posts',
@@ -35,7 +35,7 @@ export function updatePosts(data) {
   })
 }
 
-// 删除【请填写功能名称】
+// 删除帖子
 export function delPosts(postId) {
   return request({
     url: '/system/posts/' + postId,

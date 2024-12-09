@@ -101,4 +101,6 @@ public class PostsController extends BaseController
     {
         return toAjax(postsService.deletePostsByPostIds(postIds));
     }
+
+
 }

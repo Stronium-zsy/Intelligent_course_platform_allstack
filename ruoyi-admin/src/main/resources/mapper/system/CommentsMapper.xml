@@ -39,29 +39,53 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where comment_id = #{commentId}
     </select>
 
+<!--    <insert id="insertComments" parameterType="Comments" useGeneratedKeys="true" keyProperty="commentId">-->
+<!--        insert into comments-->
+<!--        <trim prefix="(" suffix=")" suffixOverrides=",">-->
+<!--            <if test="postId != null">post_id,</if>-->
+<!--            <if test="userId != null">user_id,</if>-->
+<!--            <if test="commentIndex != null">comment_index,</if>-->
+<!--            <if test="authorName != null and authorName != ''">author_name,</if>-->
+<!--            <if test="content != null and content != ''">content,</if>-->
+<!--            <if test="commentTime != null">comment_time,</if>-->
+<!--            <if test="likesCount != null">likes_count,</if>-->
+<!--            <if test="favoritesCount != null">favorites_count,</if>-->
+<!--         </trim>-->
+<!--        <trim prefix="values (" suffix=")" suffixOverrides=",">-->
+<!--            <if test="postId != null">#{postId},</if>-->
+<!--            <if test="userId != null">#{userId},</if>-->
+<!--            <if test="commentIndex != null">#{commentIndex},</if>-->
+<!--            <if test="authorName != null and authorName != ''">#{authorName},</if>-->
+<!--            <if test="content != null and content != ''">#{content},</if>-->
+<!--            <if test="commentTime != null">#{commentTime},</if>-->
+<!--            <if test="likesCount != null">#{likesCount},</if>-->
+<!--            <if test="favoritesCount != null">#{favoritesCount},</if>-->
+<!--         </trim>-->
+<!--    </insert>-->
+
     <insert id="insertComments" parameterType="Comments" useGeneratedKeys="true" keyProperty="commentId">
-        insert into comments
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="postId != null">post_id,</if>
-            <if test="userId != null">user_id,</if>
-            <if test="commentIndex != null">comment_index,</if>
-            <if test="authorName != null and authorName != ''">author_name,</if>
-            <if test="content != null and content != ''">content,</if>
-            <if test="commentTime != null">comment_time,</if>
-            <if test="likesCount != null">likes_count,</if>
-            <if test="favoritesCount != null">favorites_count,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="postId != null">#{postId},</if>
-            <if test="userId != null">#{userId},</if>
-            <if test="commentIndex != null">#{commentIndex},</if>
-            <if test="authorName != null and authorName != ''">#{authorName},</if>
-            <if test="content != null and content != ''">#{content},</if>
-            <if test="commentTime != null">#{commentTime},</if>
-            <if test="likesCount != null">#{likesCount},</if>
-            <if test="favoritesCount != null">#{favoritesCount},</if>
-         </trim>
-    </insert>
+    insert into comments
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="postId != null">post_id,</if>
+        <if test="userId != null">user_id,</if>
+        <if test="commentIndex != null">comment_index,</if>
+        <if test="authorName != null">author_name,</if>
+        <if test="content != null">content,</if>
+        <if test="commentTime != null">comment_time,</if>
+        <if test="likesCount != null">likes_count,</if>
+        <if test="favoritesCount != null">favorites_count,</if>
+     </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="postId != null">#{postId},</if>
+        <if test="userId != null">#{userId},</if>
+        <if test="commentIndex != null">#{commentIndex},</if>
+        <if test="authorName != null">#{authorName},</if>
+        <if test="content != null">#{content},</if>
+        <if test="commentTime != null">#{commentTime},</if>
+        <if test="likesCount != null">#{likesCount},</if>
+        <if test="favoritesCount != null">#{favoritesCount},</if>
+     </trim>
+</insert>
 
     <update id="updateComments" parameterType="Comments">
         update comments
