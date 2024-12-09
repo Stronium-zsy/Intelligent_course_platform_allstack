@@ -89,13 +89,20 @@
         </template>
       </el-table-column>
       <el-table-column label="创建者" align="center" prop="createBy" width="100" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="100">
+      <el-table-column label="创建时间" align="center" prop="createTime" width="250">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleRowClick(scope.row)"
+            v-hasPermi="['system:notice:view']"
+          >查看</el-button>
           <el-button
             size="mini"
             type="text"
@@ -166,6 +173,52 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="公告详情"
+      :visible.sync="dialogVisible"
+      width="35%"
+      @close="handleDialogClose"
+    >
+      <el-form v-if="noticeDetail" :model="noticeDetail" label-width="0">
+        <!-- 标题 -->
+        <el-row :gutter="20" style="margin-bottom: 20px;">
+          <el-col :span="24">
+            <h2 style="text-align: left; margin: 20px 0 20px 40px; font-size: 24px; font-weight: bold;">
+              {{ noticeDetail.noticeTitle }}
+            </h2>
+          </el-col>
+        </el-row>
+
+        <!-- 创建人和创建时间 -->
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="创建者" label-width="80px">
+              <span>{{ noticeDetail.createBy }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="创建时间" label-width="80px">
+              <span>{{ parseTime(noticeDetail.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 内容 -->
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="内容" label-width="80px">
+              <div
+                style="border: 1px solid #e4e7ed; padding: 15px; border-radius: 5px; background: #f9f9f9; max-height: 300px; overflow-y: auto;"
+              >
+                <div v-html="noticeDetail.noticeContent"></div>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -213,13 +266,32 @@ export default {
         noticeType: [
           { required: true, message: "公告类型不能为空", trigger: "change" }
         ]
-      }
+      },
+      dialogVisible: false,
+      noticeDetail: {}
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    handleRowClick(row) {
+      this.fetchNoticeDetail(row.noticeId);
+      this.dialogVisible = true;
+    },
+    fetchNoticeDetail(noticeId) {
+      getNotice(noticeId)
+        .then(response => {
+          this.noticeDetail = response.data;
+          // console.log("公告详情数据:", this.noticeDetail); // 打印 data 部分
+        })
+        .catch(() => {
+          this.$message.error('获取公告详情失败，请稍后重试');
+        });
+    },
+    handleDialogClose() {
+      this.noticeDetail = {};
+    },
     /** 查询公告列表 */
     getList() {
       this.loading = true;
