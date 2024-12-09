@@ -3,6 +3,7 @@
     <el-row>
       <!-- 左侧课程列表 -->
       <el-col :span="8" class="video-list">
+        <!-- 原有表单、表格部分 -->
         <el-form
           :model="queryParams"
           ref="queryForm"
@@ -81,7 +82,7 @@
           <h2>当前播放：{{ currentVideo.courseName }}</h2>
           <p><strong>教师：</strong>{{ currentVideo.teacherName }}</p>
           <p><strong>时间：</strong>{{ parseTime(currentVideo.classTime, '{y}-{m}-{d}') }}</p>
-          <video ref="video" controls width="100%" height="650px"></video>
+          <video ref="video" controls width="100%" height="650px" @timeupdate="captureAudio"></video>
         </div>
         <div v-else>
           <h2>请选择课程进行播放</h2>
@@ -100,7 +101,6 @@ export default {
   name: "videoPlayer",
   data() {
     return {
-      // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
@@ -108,11 +108,11 @@ export default {
         teacherName: "",
         classTime: "",
       },
-      // 数据源
       videosList: [],
       total: 0,
       loading: false,
-      currentVideo: null, // 当前播放的视频信息
+      currentVideo: null,
+      lastCapturedTime: 0, // 上次提取的时间点
     };
   },
   created() {
@@ -120,7 +120,6 @@ export default {
   },
   methods: {
     parseTime,
-    /** 获取课程视频列表 */
     getList() {
       this.loading = true;
       listVideos(this.queryParams).then((response) => {
@@ -129,12 +128,10 @@ export default {
         this.loading = false;
       });
     },
-    /** 搜索功能 */
     handleQuery() {
-      this.queryParams.pageNum = 1; // 重置到第一页
+      this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置查询条件 */
     resetQuery() {
       this.queryParams = {
         pageNum: 1,
@@ -145,25 +142,82 @@ export default {
       };
       this.handleQuery();
     },
-    /** 点击课程行播放视频 */
     handleRowClick(row) {
-      this.currentVideo = row; // 设置当前播放的视频信息
+      this.currentVideo = row;
       this.$nextTick(() => {
         const video = this.$refs.video;
         const videoUrl = row.videoPath;
-
         if (Hls.isSupported()) {
           const hls = new Hls();
           hls.attachMedia(video);
           hls.loadSource(videoUrl);
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
           video.src = videoUrl;
-          video.addEventListener("canplay", () => {
-            video.play();
-          });
+          video.addEventListener("canplay", () => video.play());
         }
       });
     },
+    captureAudio() {
+      const video = this.$refs.video;
+
+      // 检查视频元素是否存在
+      if (!video || !video.captureStream) {
+        console.error("无法访问视频流！");
+        return;
+      }
+
+      // 获取视频的音频流
+      const audioStream = video.captureStream().getAudioTracks();
+      if (audioStream.length === 0) {
+        console.error("未捕获到音频流！");
+        return;
+      }
+
+      const audioContext = new AudioContext();
+      const destination = audioContext.createMediaStreamDestination();
+      const source = audioContext.createMediaStreamSource(new MediaStream(audioStream));
+      source.connect(destination);
+
+      // 使用 MediaRecorder 捕获音频
+      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType: "audio/webm" });
+
+      const startRecording = () => {
+        const chunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          const formData = new FormData();
+          formData.append("file", blob, `audio_chunk_${Date.now()}.webm`);
+
+          // 发送音频到后端
+          fetch("http://localhost:5000/process-audio", {
+            method: "POST",
+            body: formData,
+          })
+            .then((res) => res.json())
+            .then((data) => console.log("后端处理成功:", data))
+            .catch((err) => console.error("后端处理失败:", err));
+        };
+
+        // 开始录制 1 分钟音频
+        mediaRecorder.start();
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 60000); // 录制时间为 1 分钟
+      };
+
+      // 每分钟启动一次录制
+      setInterval(() => {
+        startRecording();
+      }, 60000); // 每 1 分钟触发录制逻辑
+    },
+
   },
 };
 </script>

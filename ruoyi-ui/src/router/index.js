@@ -130,6 +130,18 @@ export const constantRoutes = [
         meta: { title: "作业详情" }
       },
       {
+        path: '/courseDetail/:courseId/discussion',
+        name: 'Discussion',
+        component: () => import('@/views/system/discussion/discussion.vue'),
+        meta: { title: "讨论区" },
+      },
+      {
+        path: '/courseDetail/:courseId/discussion/:postId',
+        name: 'PostDetail',
+        component: () => import('@/views/system/discussion/post.vue'),
+        meta: { title: "帖子详情" },
+      },
+      {
         path: "/courseDetail/:courseId/courseVideos",
         name: "Videos",
         component: () => import('@/views/system/video/index.vue'),
@@ -149,8 +161,6 @@ export const constantRoutes = [
       }
     ]
   },
-
-
   {
     path: '/user',
     component: Layout,

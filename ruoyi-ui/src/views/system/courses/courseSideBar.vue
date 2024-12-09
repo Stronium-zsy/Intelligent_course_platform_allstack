@@ -54,7 +54,7 @@
         <i class="el-icon-edit-outline"></i>
         <span>课程作业</span>
       </el-menu-item>
-      <el-menu-item :index="`/courseDiscussion/${courseId}`" @click="navigateTo(`/courseDiscussion/${courseId}`)">
+      <el-menu-item :index="`/courseDiscussion/${courseId}/courseDiscussion`" @click="navigateTo(`/courseDetail/${courseId}/discussion`)">
         <i class="el-icon-chat-dot-round"></i>
         <span>课程讨论</span>
       </el-menu-item>
