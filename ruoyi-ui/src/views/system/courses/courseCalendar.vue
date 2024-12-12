@@ -48,7 +48,7 @@ export default {
 </script>
 
 <template>
-  <div class="calendar-container">
+  <div>
     <PdfViewer v-if="pdfPath" :pdf-path="pdfPath" />
     <FileUpload
       :uploadPath="customUploadPath"
@@ -58,9 +58,4 @@ export default {
   </div>
 </template>
 
-<style scoped lang="scss">
-.calendar-container {
-  height: 100%;
-  width: 70%;
-}
-</style>
+

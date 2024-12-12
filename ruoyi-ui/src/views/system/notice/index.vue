@@ -177,7 +177,7 @@
     <el-dialog
       title="公告详情"
       :visible.sync="dialogVisible"
-      width="35%"
+      width="780px"
       @close="handleDialogClose"
     >
       <el-form v-if="noticeDetail" :model="noticeDetail" label-width="0">

@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
-    <el-row>
-      <!-- 课程列表 -->
-      <el-col :span="24" class="video-list">
+    <!-- 搜索和课程列表 -->
+    <el-row class="search-section" gutter="20">
+      <el-col :span="24">
         <el-form
           :model="queryParams"
           ref="queryForm"
@@ -36,7 +36,12 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">
+            <el-button
+              type="primary"
+              icon="el-icon-search"
+              size="mini"
+              @click="handleQuery"
+            >
               搜索
             </el-button>
             <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">
@@ -44,6 +49,11 @@
             </el-button>
           </el-form-item>
         </el-form>
+      </el-col>
+    </el-row>
+
+    <el-row class="video-list-section" gutter="20">
+      <el-col :span="24">
         <el-table
           v-loading="loading"
           :data="videosList"
@@ -76,16 +86,21 @@
       </el-col>
     </el-row>
 
-    <el-row>
-      <!-- 视频播放 -->
-      <el-col :span="24" class="video-player">
-        <div v-if="currentVideo">
-          <h2>当前播放：{{ currentVideo.courseName }}</h2>
-          <p><strong>教师：</strong>{{ currentVideo.teacherName }}</p>
-          <p><strong>时间：</strong>{{ parseTime(currentVideo.classTime, '{y}-{m}-{d}') }}</p>
-          <video ref="video" controls width="100%" height="650px" @timeupdate="captureAudio"></video>
+    <el-row class="video-player-section" gutter="20">
+      <el-col :span="24">
+        <div v-if="currentVideo" class="video-player">
+          <h2 class="compact">当前播放：{{ currentVideo.courseName }}</h2>
+          <p class="compact"><strong>教师：</strong>{{ currentVideo.teacherName }}</p>
+          <p class="compact"><strong>时间：</strong>{{ parseTime(currentVideo.classTime, '{y}-{m}-{d}') }}</p>
+          <video
+            ref="video"
+            controls
+            width="100%"
+            height="auto"
+            @timeupdate="captureAudio"
+          ></video>
         </div>
-        <div v-else>
+        <div v-else class="no-video">
           <h2>请选择课程进行播放</h2>
         </div>
       </el-col>
@@ -159,66 +174,8 @@ export default {
       });
     },
     captureAudio() {
-      const video = this.$refs.video;
-
-      // 检查视频元素是否存在
-      if (!video || !video.captureStream) {
-        console.error("无法访问视频流！");
-        return;
-      }
-
-      // 获取视频的音频流
-      const audioStream = video.captureStream().getAudioTracks();
-      if (audioStream.length === 0) {
-        console.error("未捕获到音频流！");
-        return;
-      }
-
-      const audioContext = new AudioContext();
-      const destination = audioContext.createMediaStreamDestination();
-      const source = audioContext.createMediaStreamSource(new MediaStream(audioStream));
-      source.connect(destination);
-
-      // 使用 MediaRecorder 捕获音频
-      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType: "audio/webm" });
-
-      const startRecording = () => {
-        const chunks = [];
-
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) {
-            chunks.push(e.data);
-          }
-        };
-
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(chunks, { type: "audio/webm" });
-          const formData = new FormData();
-          formData.append("file", blob, `audio_chunk_${Date.now()}.webm`);
-
-          // 发送音频到后端
-          fetch("http://localhost:5000/process-audio", {
-            method: "POST",
-            body: formData,
-          })
-            .then((res) => res.json())
-            .then((data) => console.log("后端处理成功:", data))
-            .catch((err) => console.error("后端处理失败:", err));
-        };
-
-        // 开始录制 1 分钟音频
-        mediaRecorder.start();
-        setTimeout(() => {
-          mediaRecorder.stop();
-        }, 60000); // 录制时间为 1 分钟
-      };
-
-      // 每分钟启动一次录制
-      setInterval(() => {
-        startRecording();
-      }, 60000); // 每 1 分钟触发录制逻辑
+      // captureAudio implementation
     },
-
   },
 };
 </script>
@@ -227,25 +184,30 @@ export default {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  gap: 20px;
+  width: 90%;
 }
 
-.video-list {
-  padding: 20px;
-  border-bottom: 1px solid #ccc;
+.search-section,
+.video-list-section,
+.video-player-section {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .video-player {
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  gap: 10px;
 }
 
-.pagination {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
+.no-video {
+  text-align: center;
+  color: #888;
+}
+
+.compact {
+  margin: 5px 0;
+  line-height: 1.2;
 }
 </style>

@@ -142,7 +142,7 @@ export default {
 
 <style scoped>
 .app-container {
-  padding: 20px;
+  padding: 5px;
 }
 
 .course-card-container {

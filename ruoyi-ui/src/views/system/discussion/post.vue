@@ -229,10 +229,9 @@ export default {
 
 <style scoped>
 .post-detail {
-  width: 80%;
+  width: 75%;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f5f5f5;
 }
 
 .post-card {
@@ -274,7 +273,7 @@ export default {
 }
 
 .post-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   margin: 16px 0;
   color: #333;
@@ -302,11 +301,7 @@ export default {
 }
 
 .comments-section {
-  margin-bottom: 24px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+
 }
 
 .comments-list {
@@ -330,42 +325,12 @@ export default {
 .comment-meta {
   display: flex;
   gap: 8px;
-  color: #8492a6;
   font-size: 14px;
+  color: #8492a6;
 }
 
 .comment-content {
-  font-size: 15px;
-  line-height: 1.5;
-  margin-bottom: 12px;
-  color: #666;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 16px;
-}
-
-.reply-form {
-  margin-top: 24px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-}
-
-.reply-form h3 {
   margin-bottom: 16px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.back-button {
-  margin-bottom: 20px;
-  background-color: transparent;
-  border: none;
-  color: #0057e7;
   font-size: 16px;
 }
 
@@ -373,6 +338,58 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
+}
+
+.reply-form {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.author-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  .post-detail {
+    width: 100%;
+  }
+
+  .post-title {
+    font-size: 20px;
+  }
+
+  .post-content {
+    font-size: 14px;
+  }
+
+  .post-stats {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .author-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .comment-meta {
+    display: block;
+    margin-top: 5px;
+  }
+
+  .comments-list {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .reply-form-inline {
+    flex-direction: row;
+    gap: 12px;
+  }
 }
 </style>

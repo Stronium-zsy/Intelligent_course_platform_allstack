@@ -1,5 +1,4 @@
 <template>
-  <div class="discussion-board">
     <el-container>
       <el-header class="header">
         <h1 class="title">讨论板</h1>
@@ -59,7 +58,6 @@
         </el-row>
       </el-main>
     </el-container>
-  </div>
 </template>
 
 <script>
@@ -85,7 +83,7 @@ export default {
   methods: {
     fetchDiscussion() {
       try {
-        listPosts({ pageNum: 1, pageSize: 99999 }).then(
+        listPosts({pageNum: 1, pageSize: 99999}).then(
           response => {
             if (response.rows) {
               this.posts = response.rows;
@@ -96,42 +94,39 @@ export default {
         console.error('Failed to fetch discussion posts', error);
       }
     },
-   async submitPost() {
-  if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
-    this.$message.error('标题和内容不能为空');
-    return;
-  }
+    async submitPost() {
+      if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
+        this.$message.error('标题和内容不能为空');
+        return;
+      }
 
-  this.submitting = true;
-  try {
-    const response = await addPosts({
-      courseId: this.courseId,
-      title: this.newPost.title,
-      content: this.newPost.content,
-      userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
-      authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
-    });
+      this.submitting = true;
+      try {
+        const response = await addPosts({
+          courseId: this.courseId,
+          title: this.newPost.title,
+          content: this.newPost.content,
+          userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
+          authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
+        });
 
+        // 确保服务器返回了新的帖子对象
+        if (response) {
+          this.newPost.title = '';
+          this.newPost.content = '';
+          this.$message.success('帖子发送成功！');
+          this.fetchDiscussion(); // 重新获取帖子列表
+        } else {
+          this.$message.error('帖子发布失败');
+        }
 
-
-
-    // 确保服务器返回了新的帖子对象
-    if (response) {
-      this.newPost.title = '';
-      this.newPost.content = '';
-      this.$message.success('帖子发送成功！');
-      this.fetchDiscussion(); // 重新获取帖子列表
-    } else {
-      this.$message.error('帖子发布失败');
-    }
-
-  } catch (error) {
-    console.error('Failed to submit post:', error);
-    this.$message.error('帖子发布失败');
-  } finally {
-    this.submitting = false;
-  }
-},
+      } catch (error) {
+        console.error('Failed to submit post:', error);
+        this.$message.error('帖子发布失败');
+      } finally {
+        this.submitting = false;
+      }
+    },
     formatDate(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleString(); // 将ISO格式的时间字符串转换为本地时间字符串
@@ -241,6 +236,35 @@ export default {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .discussion-board {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .post-card {
+    padding: 1rem;
+  }
+
+  .post-title {
+    font-size: 1.2rem; /* 调整标题字体大小 */
+  }
+
+  .post-time {
+    font-size: 0.8rem;
+  }
+
+  .post-author,
+  .post-stats {
+    font-size: 0.8rem;
+  }
+
+  .new-post-card h2 {
+    font-size: 1.5rem; /* 调整新帖标题字体大小 */
+  }
+}
+
+/* 响应式设计 */
 @media (max-width: 768px) {
   .discussion-board {
     width: 100%;
@@ -249,6 +273,25 @@ export default {
 
   .post-card {
     padding: 1rem;
+  }
+
+  /* 将 .post-footer 改为垂直排列 */
+  .post-footer {
+    flex-direction: column;
+    align-items: flex-start; /* 让子元素对齐左边 */
+    gap: 10px; /* 子元素之间的间距 */
+  }
+
+  /* 调整 post-footer 中的子元素 */
+  .post-author,
+  .post-stats {
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  /* 调整按钮和链接的位置 */
+  .read-more {
+    align-self: flex-start; /* 确保 "阅读更多" 按钮在左侧 */
   }
 }
 </style>

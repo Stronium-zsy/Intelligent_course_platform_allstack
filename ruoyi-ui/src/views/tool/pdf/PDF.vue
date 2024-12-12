@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import downloadModule from "@/plugins/download"
+import downloadModule from "@/plugins/download";
 import axios from "axios";
 
 export default {
@@ -44,23 +44,19 @@ export default {
   },
   async mounted() {
     if (this.pdfPath) {
-      // 使用 async/await 等待 Promise 解析出 blob
       let blob = await downloadModule.__resource__(this.pdfPath);
       if (blob) {
-        console.log(blob);
-        if (blob.type !== 'application/pdf') {
-          blob = new Blob([blob], { type: 'application/pdf' });
+        if (blob.type !== "application/pdf") {
+          blob = new Blob([blob], { type: "application/pdf" });
         }
-        // 释放之前的 URL 以避免内存泄漏
         if (this.pdfUrl) {
           URL.revokeObjectURL(this.pdfUrl);
         }
         this.pdfUrl = this.fileUrl + encodeURIComponent(URL.createObjectURL(blob));
       } else {
-        console.error('Failed to fetch Blob');
+        console.error("Failed to fetch Blob");
       }
     } else if (this.url) {
-      // 如果传递了 URL，则直接使用 URL
       this.pdfUrl = this.fileUrl + encodeURIComponent(this.url);
     }
   },
@@ -77,15 +73,14 @@ export default {
       }
       this.isGenerating = true;
       try {
-        const pdfPath = this.pdfPath || this.url; // 使用 PDF 路径或 URL
+        const pdfPath = this.pdfPath || this.url;
         const response = await axios.post("http://127.0.0.1:5000/generate_mindmap_from_pdf", {
           pdf_path: pdfPath,
         });
         if (response.data && response.data.html_path) {
-          this.mindmapHtml = ""; // 清空之前的内容
-          const mindmapUrl = response.data.html_path; // 后端返回的 HTML 路径
-          // 直接通过 iframe 加载 HTML 文件
-          this.mindmapHtml = `<iframe src="${"/mindmaps/" + mindmapUrl}" width="100%" height="600px" frameborder="0"></iframe>`;
+          this.mindmapHtml = "";
+          const mindmapUrl = response.data.html_path;
+          this.mindmapHtml = `<iframe src="/mindmaps/${mindmapUrl}" width="100%" height="600px" frameborder="0"></iframe>`;
         } else {
           console.error("未生成思维导图:", response.data);
         }
@@ -102,9 +97,11 @@ export default {
 <style scoped lang="scss">
 .container {
   display: flex;
-  flex-wrap: wrap;  /* 允许内容换行 */
-  height: 100%;
-  overflow: hidden;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f9f9f9;
+  gap: 10px;
+  padding: 10px;
 }
 
 .pdf-viewer,
@@ -112,34 +109,45 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border: 1px solid #ddd;
-  overflow: auto;
-  margin: 5px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .pdf-viewer {
-  margin-right: 1px; /* 分隔两部分 */
+  margin-bottom: 10px;
 }
 
 .loading {
   display: flex;
-  align-items: center;
   justify-content: center;
-  flex: 1;
+  align-items: center;
+  font-size: 16px;
+  color: #555;
 }
 
 .action {
-  margin: 10px;
+  padding: 10px;
   text-align: center;
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ddd;
 }
 
 button {
   padding: 10px 20px;
-  background-color: #007bff;
+  font-size: 16px;
   color: white;
+  background-color: #007bff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 
 button:disabled {
@@ -150,41 +158,22 @@ button:disabled {
 .mindmap-content {
   flex: 1;
   padding: 10px;
-  border-top: 1px solid #ddd;
 }
 
-@media (max-width: 768px) {
-  .pdf-viewer, .mindmap-viewer {
-    flex: 1 1 100%; /* 在小屏幕上每个部分占满整行 */
-    margin-right: 0; /* 去除右边距 */
-  }
-
-  .action {
-    margin-top: 10px;
-  }
-
-  .mindmap-content iframe {
-    height: 400px; /* 小屏幕上可以减少 iframe 的高度 */
-  }
+.mindmap-content iframe {
+  border: none;
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  .pdf-viewer, .mindmap-viewer {
-    flex: 1 1 48%; /* 在中等屏幕（平板）上每部分占据 48% */
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
+    gap: 20px;
   }
 
-  .mindmap-content iframe {
-    height: 500px; /* 中屏设备增加 iframe 高度 */
-  }
-}
-
-@media (min-width: 1024px) {
-  .pdf-viewer, .mindmap-viewer {
-    flex: 1 1 48%; /* 大屏设备上，左右两部分占据 48% */
-  }
-
-  .mindmap-content iframe {
-    height: 600px; /* 大屏设备更大的 iframe 高度 */
+  .pdf-viewer,
+  .mindmap-viewer {
+    flex: 1;
+    height: calc(100vh - 20px);
   }
 }
 </style>

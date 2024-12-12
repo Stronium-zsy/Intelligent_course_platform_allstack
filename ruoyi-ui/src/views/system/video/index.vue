@@ -27,7 +27,7 @@ export default {
 
 <style scoped lang="scss">
 .course-video-container{
-  width:90%;
+  width:100%;
   height:100%;
 }
 
