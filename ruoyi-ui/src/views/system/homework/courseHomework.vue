@@ -379,6 +379,5 @@ export default {
   display:flex;
   flex-direction: column;
   width:80%;
-  margin-left:230px;
 }
 </style>

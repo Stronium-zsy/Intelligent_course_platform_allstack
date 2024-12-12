@@ -1,9 +1,8 @@
 <template>
   <div class="app-container">
     <el-row>
-      <!-- 左侧课程列表 -->
-      <el-col :span="8" class="video-list">
-        <!-- 原有表单、表格部分 -->
+      <!-- 课程列表 -->
+      <el-col :span="24" class="video-list">
         <el-form
           :model="queryParams"
           ref="queryForm"
@@ -75,9 +74,11 @@
           @pagination="getList"
         />
       </el-col>
+    </el-row>
 
-      <!-- 右侧视频播放 -->
-      <el-col :span="16" class="video-player">
+    <el-row>
+      <!-- 视频播放 -->
+      <el-col :span="24" class="video-player">
         <div v-if="currentVideo">
           <h2>当前播放：{{ currentVideo.courseName }}</h2>
           <p><strong>教师：</strong>{{ currentVideo.teacherName }}</p>
@@ -230,15 +231,12 @@ export default {
 }
 
 .video-list {
-  padding-right: 10px;
-  border-right: 1px solid #ccc;
-  height: calc(100vh - 150px);
-  overflow-y: auto;
+  padding: 20px;
+  border-bottom: 1px solid #ccc;
 }
 
 .video-player {
-  padding-left: 10px;
-  height: calc(100vh - 150px);
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;

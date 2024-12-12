@@ -95,19 +95,15 @@ export default {
         this.isGenerating = false;
       }
     },
-
-},
+  },
 };
-
-
-
 </script>
 
 <style scoped lang="scss">
 .container {
   display: flex;
+  flex-wrap: wrap;  /* 允许内容换行 */
   height: 100%;
-  width:1500px;
   overflow: hidden;
 }
 
@@ -118,7 +114,7 @@ export default {
   flex-direction: column;
   border: 1px solid #ddd;
   overflow: auto;
-  height:100%;
+  margin: 5px;
 }
 
 .pdf-viewer {
@@ -157,4 +153,38 @@ button:disabled {
   border-top: 1px solid #ddd;
 }
 
+@media (max-width: 768px) {
+  .pdf-viewer, .mindmap-viewer {
+    flex: 1 1 100%; /* 在小屏幕上每个部分占满整行 */
+    margin-right: 0; /* 去除右边距 */
+  }
+
+  .action {
+    margin-top: 10px;
+  }
+
+  .mindmap-content iframe {
+    height: 400px; /* 小屏幕上可以减少 iframe 的高度 */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .pdf-viewer, .mindmap-viewer {
+    flex: 1 1 48%; /* 在中等屏幕（平板）上每部分占据 48% */
+  }
+
+  .mindmap-content iframe {
+    height: 500px; /* 中屏设备增加 iframe 高度 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .pdf-viewer, .mindmap-viewer {
+    flex: 1 1 48%; /* 大屏设备上，左右两部分占据 48% */
+  }
+
+  .mindmap-content iframe {
+    height: 600px; /* 大屏设备更大的 iframe 高度 */
+  }
+}
 </style>

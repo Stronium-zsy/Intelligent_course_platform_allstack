@@ -177,7 +177,6 @@ export default {
 .file-explorer-container {
   height: 100%;
   width: 90%;
-  margin-left: 200px;
   min-height: 500px;
 }
 

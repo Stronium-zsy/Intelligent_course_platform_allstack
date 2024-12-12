@@ -62,6 +62,5 @@ export default {
 .calendar-container {
   height: 100%;
   width: 70%;
-  margin-left: 230px;
 }
 </style>

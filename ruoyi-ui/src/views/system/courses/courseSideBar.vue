@@ -1,11 +1,20 @@
 <template>
-  <div class="sidebar-container">
+  <div class="course-sidebar-container">
+    <!-- 收起/展开切换按钮 -->
+    <button class="toggle-btn" @click="toggleCollapse">
+      <i :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
+    </button>
+
+    <!-- 菜单组件 -->
     <el-menu
       :default-active="$route.path"
       class="el-menu-vertical-demo"
+      @open="handleOpen"
+      @close="handleClose"
+      :collapse="isCollapse"
       background-color="#304156"
-      text-color="#fff"
-      active-text-color="#ffd04b"
+      text-color="#bfcbd9"
+      active-text-color="#409eff"
     >
       <!-- 首页菜单项 -->
       <el-menu-item :index="'/courses'" @click="navigateTo('/courses')">
@@ -63,43 +72,64 @@
 </template>
 
 <script>
-import { listHomework } from "@/api/system/homework";
-
 export default {
-  name: "Sidebar",
+  name: "CourseSideBar",
+  props: {
+    courseId: {
+      type: String,
+      required: true
+    },
+    defaultActive: {
+      type: String,
+      default: "1-1"
+    }
+  },
   data() {
     return {
-      courseId: this.$route.params.courseId,
-      homeworkList: []
+      isCollapse: false // 控制侧边栏收起/展开
     };
   },
-  created() {
-    this.fetchHomework();
-  },
   methods: {
-    // 跳转路由的方法
+    handleOpen(key, keyPath) {
+      console.log("Open:", key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log("Close:", key, keyPath);
+    },
     navigateTo(routePath) {
       this.$router.push(routePath);
     },
-    fetchHomework() {
-      // 如果需要，解开并实现获取作业数据的 API 调用
-      // listHomework().then(response => {
-      //   this.homeworkList = response.data;
-      // }).catch(error => {
-      //   console.error("Failed to fetch homework list:", error);
-      // });
+    toggleCollapse() {
+      this.isCollapse = !this.isCollapse;
     }
   }
 };
 </script>
 
 <style scoped>
-.sidebar-container {
-  width: 250px;
+.course-sidebar-container {
   height: 100vh;
+  background-color: rgb(48, 65, 86);
   color: #fff;
+  display: flex;
+  flex-direction: column;
 }
-.el-menu-vertical-demo {
-  border-right: none;
+
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 200px;
+  flex-grow: 1;
+}
+
+.toggle-btn {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  margin: 10px;
+}
+
+.toggle-btn:hover {
+  color: #409EFF;
 }
 </style>
