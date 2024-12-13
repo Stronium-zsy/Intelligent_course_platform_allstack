@@ -72,13 +72,10 @@
 </template>
 
 <script>
+import { listHomework } from "@/api/system/homework";
 export default {
   name: "CourseSideBar",
   props: {
-    courseId: {
-      type: String,
-      required: true
-    },
     defaultActive: {
       type: String,
       default: "1-1"
@@ -86,7 +83,9 @@ export default {
   },
   data() {
     return {
-      isCollapse: false // 控制侧边栏收起/展开
+      isCollapse: false, // 控制侧边栏收起/展开
+      courseId: this.$route.params.courseId,
+      homeworkList: []
     };
   },
   methods: {
@@ -101,6 +100,14 @@ export default {
     },
     toggleCollapse() {
       this.isCollapse = !this.isCollapse;
+    },
+    fetchHomework() {
+      // 如果需要，解开并实现获取作业数据的 API 调用
+      // listHomework().then(response => {
+      //   this.homeworkList = response.data;
+      // }).catch(error => {
+      //   console.error("Failed to fetch homework list:", error);
+      // });
     }
   }
 };

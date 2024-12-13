@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "hls.js": "^1.5.17"
+    "hls.js": "^1.5.17",
+    "moment": "^2.30.1"
   }
 }
