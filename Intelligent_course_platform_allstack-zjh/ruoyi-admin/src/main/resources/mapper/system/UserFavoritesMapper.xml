@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UserFavoritesMapper">
+
+    <!-- ResultMap 定义 -->
+    <resultMap type="UserFavorites" id="UserFavoritesResult">
+        <result property="favoriteId" column="favorite_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="favoriteTime" column="favorite_time"/>
+    </resultMap>
+
+    <!-- 公共查询部分 -->
+    <sql id="selectUserFavoritesVo">
+        SELECT favorite_id, user_id, post_id, favorite_time
+        FROM user_favorites
+    </sql>
+
+    <!-- 查询收藏列表 -->
+    <select id="selectUserFavoritesList" parameterType="UserFavorites" resultMap="UserFavoritesResult">
+        SELECT
+        uf.favorite_id,
+        uf.user_id,
+        uf.post_id,
+        uf.favorite_time,
+        p.title AS post_title
+        FROM
+        user_favorites uf
+        LEFT JOIN
+        posts p ON uf.post_id = p.post_id
+        <where>
+            <if test="userId != null"> AND uf.user_id = #{userId}</if>
+            <if test="postId != null"> AND uf.post_id = #{postId}</if>
+            <if test="favoriteTime != null"> AND uf.favorite_time = #{favoriteTime}</if>
+        </where>
+    </select>
+
+
+    <!-- 根据收藏ID查询收藏 -->
+    <select id="selectUserFavoritesByFavoriteId" parameterType="Long" resultMap="UserFavoritesResult">
+        <include refid="selectUserFavoritesVo"/>
+        WHERE favorite_id = #{favoriteId}
+    </select>
+
+    <!-- 检查用户是否已收藏帖子 -->
+    <select id="selectUserFavoritesByUserIdAndPostId" parameterType="map" resultMap="UserFavoritesResult">
+        SELECT favorite_id, user_id, post_id, favorite_time
+        FROM user_favorites
+        WHERE user_id = #{userId} AND post_id = #{postId}
+    </select>
+
+    <!-- 新增收藏 -->
+    <insert id="insertUserFavorites" parameterType="UserFavorites" useGeneratedKeys="true" keyProperty="favoriteId">
+        INSERT INTO user_favorites
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="postId != null">post_id,</if>
+            <if test="favoriteTime != null">favorite_time,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="postId != null">#{postId},</if>
+            <if test="favoriteTime != null">#{favoriteTime},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改收藏 -->
+    <update id="updateUserFavorites" parameterType="UserFavorites">
+        UPDATE user_favorites
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="postId != null">post_id = #{postId},</if>
+            <if test="favoriteTime != null">favorite_time = #{favoriteTime},</if>
+        </trim>
+        WHERE favorite_id = #{favoriteId}
+    </update>
+
+    <!-- 删除单个收藏 -->
+    <delete id="deleteUserFavoritesByFavoriteId" parameterType="Long">
+        DELETE FROM user_favorites WHERE favorite_id = #{favoriteId}
+    </delete>
+
+    <!-- 删除多个收藏 -->
+    <delete id="deleteUserFavoritesByFavoriteIds" parameterType="String">
+        DELETE FROM user_favorites WHERE favorite_id IN
+        <foreach item="favoriteId" collection="array" open="(" separator="," close=")">
+            #{favoriteId}
+        </foreach>
+    </delete>
+
+    <!-- 更新帖子收藏数 -->
+    <update id="incrementPostFavoritesCount" parameterType="Long">
+        UPDATE posts SET favorites_count = favorites_count + 1 WHERE post_id = #{postId}
+    </update>
+
+    <update id="decrementPostFavoritesCount" parameterType="Long">
+        UPDATE posts SET favorites_count = GREATEST(favorites_count - 1, 0) WHERE post_id = #{postId}
+    </update>
+
+
+    <!-- 更新评论收藏数 -->
+    <update id="incrementCommentFavoritesCount" parameterType="Long">
+        UPDATE comments SET favorites_count = favorites_count + 1 WHERE comment_id = #{commentId}
+    </update>
+
+    <update id="decrementCommentFavoritesCount" parameterType="Long">
+        UPDATE comments SET favorites_count = favorites_count - 1 WHERE comment_id = #{commentId}
+    </update>
+
+    <delete id="deleteUserFavorites" parameterType="map">
+        DELETE FROM user_favorites
+        WHERE user_id = #{userId} AND post_id = #{postId}
+    </delete>
+
+    <select id="getFavoritesCountByPostId" parameterType="Long" resultType="int">
+        SELECT COUNT(*) FROM user_favorites WHERE post_id = #{postId}
+    </select>
+
+</mapper>
