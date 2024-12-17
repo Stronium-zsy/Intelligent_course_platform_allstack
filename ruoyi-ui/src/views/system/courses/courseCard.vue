@@ -1,6 +1,7 @@
 <template>
   <div class="card-container">
-    <div class="card-wrap"
+    <div :class="cardClass"
+         v-if="!isSingle"
          @mousemove="handleMouseMove"
          @mouseenter="handleMouseEnter"
          @mouseleave="handleMouseLeave"
@@ -12,26 +13,22 @@
           <p>{{ description }}</p>
         </div>
       </div>
-      <!-- 详细信息面板 -->
     </div>
-    <!--  <div v-if="showDetailPanel" class="details-panel">-->
-
-    <!--    <StatsChart/>-->
-    <!--    &lt;!&ndash; 使用图表展示详细数据 &ndash;&gt;-->
-    <!--    &lt;!&ndash;      <RecruitmentChart :data="recruitmentData" />&ndash;&gt;-->
-    <!--  </div>-->
+    <div :class="cardClass" v-else>
+      <div class="card">
+        <div class="card-bg" :style="cardBgImage"></div>
+        <div class="card-info">
+          <h1>{{ name }}</h1>
+          <p>{{ description }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-// import RecruitmentChart from './RecruitmentChart.vue'; // 确保路径正确
-
-
 export default {
   name: 'courseCard',
-  // components: {
-  //   RecruitmentChart
-  // },
   props: {
     name: {
       type: String,
@@ -44,6 +41,10 @@ export default {
     image: {
       type: String,
       required: true
+    },
+    isSingle: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -52,9 +53,7 @@ export default {
       height: 0,
       mouseX: 0,
       mouseY: 0,
-      mouseLeaveDelay: null,
-      showDetailPanel: false,
-      recruitmentData: {} // 存储图表数据
+      mouseLeaveDelay: null
     };
   },
   computed: {
@@ -65,15 +64,21 @@ export default {
       return this.mouseY / this.height;
     },
     cardStyle() {
-      const rX = this.mousePX * 30;
-      const rY = this.mousePY * -30;
+      if (this.isSingle) {
+        return {};
+      }
+      const rX = this.mousePX * 10;
+      const rY = this.mousePY * -10;
       return {
         transform: `rotateY(${rX}deg) rotateX(${rY}deg)`
       };
     },
     cardBgTransform() {
-      const tX = this.mousePX * -40;
-      const tY = this.mousePY * -40;
+      if (this.isSingle) {
+        return {};
+      }
+      const tX = this.mousePX * -20;
+      const tY = this.mousePY * -20;
       return {
         transform: `translateX(${tX}px) translateY(${tY}px)`
       };
@@ -82,6 +87,9 @@ export default {
       return {
         backgroundImage: `url(${this.image})`
       };
+    },
+    cardClass() {
+      return this.isSingle ? 'card-wrap single' : 'card-wrap';
     }
   },
   methods: {
@@ -98,8 +106,7 @@ export default {
         this.mouseX = 0;
         this.mouseY = 0;
       }, 1000);
-    },
-
+    }
   },
   mounted() {
     this.width = this.$refs.card.offsetWidth;
@@ -114,7 +121,12 @@ export default {
   transform: perspective(800px);
   transform-style: preserve-3d;
   cursor: pointer;
-  position: relative; /* Added to position the details panel */
+  position: relative;
+}
+
+.card-wrap.single {
+  transform: none;
+  cursor: default;
 }
 
 .card {
@@ -135,8 +147,8 @@ export default {
 .card-bg {
   opacity: 0.5;
   position: absolute;
-  top:-20px;
-  left:-20px;
+  top: -20px;
+  left: -20px;
   width: 120%;
   height: 120%;
   background-repeat: no-repeat;
@@ -217,41 +229,10 @@ export default {
 .card-wrap:hover .card {
   transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1),
   box-shadow 2s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow: rgba(255, 255, 255, 0.2) 0 0 40px 5px,  /* White outer glow */
-  rgba(255, 255, 255, 1) 0 0 0 1px,  /* Solid white border */
-  rgba(0, 0, 0, 0.66) 0 30px 60px 0,  /* Black shadow */
-  inset #333 0 0 0 5px,  /* Inner dark border */
-  inset rgba(255, 255, 255, 0.5) 0 0 0 6px;  /* Inner light border */
-}
-
-/* 新增详细信息面板样式 */
-.details-panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 20px;
-  box-sizing: border-box;
-  overflow: auto;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-}
-.close-btn{
-  width:30px;
-  height:30px;
-  position:absolute;
-  top:0;
-  left:0;
-  background:transparent;
-}
-.details-panel button {
-  border: none;
-  color: #fff;
-  padding: 10px;
-  cursor: pointer;
+  box-shadow: rgba(255, 255, 255, 0.2) 0 0 40px 5px,
+  rgba(255, 255, 255, 1) 0 0 0 1px,
+  rgba(0, 0, 0, 0.66) 0 30px 60px 0,
+  inset #333 0 0 0 5px,
+  inset rgba(255, 255, 255, 0.5) 0 0 0 6px;
 }
 </style>
