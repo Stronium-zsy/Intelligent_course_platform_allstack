@@ -1,5 +1,5 @@
 <template>
-  <div class="post-detail">
+  <div class="post-detail" @scroll="handleScroll">
     <el-button class="back-button" icon="el-icon-arrow-left" @click="goBack">返回</el-button>
 
     <!-- 主帖子内容 -->
@@ -57,7 +57,7 @@
               <el-button type="text" @click="showReplyForm(comment.commentId)">回复</el-button>
             </div>
           </div>
-          <div class="comment-content">{{ comment.content }}</div>
+          <div class="comment-content">{{ formatCommentContent(comment) }}</div>
           <div v-if="replyingTo === comment.commentId" class="reply-form-inline">
             <el-input
               type="textarea"
@@ -75,7 +75,7 @@
     <!-- 回复表单 -->
     <el-card class="reply-form">
       <h3>发表评论</h3>
-      <el-form :model="replyForm" @submit.native.prevent="submitReply">
+      <el-form :model="replyForm" @submit.native.prevent="submitComment">
         <el-form-item>
           <el-input
             type="textarea"
@@ -114,7 +114,10 @@ export default {
       },
       replyingTo: null, // 当前正在回复的评论ID
       submitting: false, // 表单提交状态
-      likedComments: [] // 存储已点赞的评论ID
+      likedComments: [], // 存储已点赞的评论ID
+      loading: false, // 加载状态
+      page: 1, // 当前页码
+      pageSize: 1000000 // 每页显示的评论数
     };
   },
   created() {
@@ -138,16 +141,22 @@ export default {
     },
 
     fetchComments() {
+      if (this.loading) return;
+      this.loading = true;
       try {
-        listComments({ postId: this.postId }).then(
+        listComments({ postId: this.postId, page: this.page, pageSize: this.pageSize }).then(
           response => {
             if (response.rows) {
-              this.comments = response.rows;
+              this.comments = [...this.comments, ...response.rows];
+              this.page++;
             }
           }
-        );
+        ).finally(() => {
+          this.loading = false;
+        });
       } catch (error) {
-        console.error('Failed to fetch comments', error);
+        console.error('Failed to fetch comments:', error);
+        this.loading = false;
       }
     },
     async likePost(postId) {
@@ -192,10 +201,11 @@ export default {
 
       this.submitting = true;
       try {
+        const replyToComment = this.comments.find(c => c.commentId === replyTo);
         const response = await addComments({
           postId: this.postId,
           replyTo,
-          content: this.replyForm.content,
+          content: `回复 <span class="highlight">#${replyToComment.commentIndex}</span> <span class="highlight">@${replyToComment.authorName}</span>: ${this.replyForm.content}`,
           userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
           commentIndex: this.comments.length + 1, // 设置评论索引
           authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
@@ -217,12 +227,57 @@ export default {
         this.submitting = false;
       }
     },
-    goBack() {
-      this.$router.go(-1);
+    async submitComment() {
+      if (!this.replyForm.content.trim()) {
+        return;
+      }
+
+      this.submitting = true;
+      try {
+        const response = await addComments({
+          postId: this.postId,
+          content: this.replyForm.content,
+          userId: this.$store.state.user.id, // 假设用户ID存储在Vuex状态管理中
+          commentIndex: this.comments.length + 1, // 设置评论索引
+          authorName: this.$store.state.user.name // 假设用户名存储在Vuex状态管理中
+        });
+
+        // 确保服务器返回了新的评论对象
+        if (response && response.data) {
+          this.replyForm.content = '';
+          this.$message.success('评论提交成功！');
+          this.fetchComments(); // 重新获取评论列表
+        } else {
+          throw new Error('Invalid response from server');
+        }
+      } catch (error) {
+        console.error('Failed to submit comment:', error);
+        this.$message.error('评论提交失败');
+      } finally {
+        this.submitting = false;
+      }
     },
-    formatDate(date) {
-      return moment(date).fromNow();
+    handleScroll(event) {
+      const bottom = event.target.scrollHeight - event.target.scrollTop === event.target.clientHeight;
+      if (bottom) {
+        this.fetchComments();
+      }
+    },
+    goBack() {
+  this.$router.go(-1);
+},
+formatDate(date) {
+  return moment(date).fromNow();
+},
+formatCommentContent(comment) {
+  if (comment.replyTo) {
+    const repliedComment = this.comments.find(c => c.commentId === comment.replyTo);
+    if (repliedComment) {
+      return `回复 <span class="highlight">#${repliedComment.commentIndex}</span> <span class="highlight">@${repliedComment.authorName}</span>: ${comment.content}`;
     }
+  }
+  return comment.content;
+}
   }
 };
 </script>
@@ -232,6 +287,8 @@ export default {
   width: 75%;
   margin: 0 auto;
   padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .post-card {
