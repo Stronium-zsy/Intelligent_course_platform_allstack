@@ -1,5 +1,6 @@
 package com.ruoyi.system.mapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,5 +51,9 @@ public interface UserFavoritesMapper {
      * @return 收藏数
      */
     int getFavoritesCountByPostId(@Param("postId") Long postId);
+
+
+    public List<UserFavorites> selectUserFavoritesByCriteria(UserFavorites userFavorites);
+
 
 }

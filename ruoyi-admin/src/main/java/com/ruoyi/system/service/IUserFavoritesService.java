@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import java.util.Date;
 import java.util.List;
 import com.ruoyi.system.domain.UserFavorites;
 
@@ -41,5 +42,12 @@ public interface IUserFavoritesService {
      * @return 删除的记录数
      */
     int deleteUserFavorites(Long[] favoriteIds);
+
+    /**
+     * 根据用户名和时间条件查询收藏记录
+     * @param userFavorites 包含查询条件的对象
+     * @return 用户收藏记录列表
+     */
+    List<UserFavorites> selectUserFavoritesByCriteria(UserFavorites userFavorites);
 
 }

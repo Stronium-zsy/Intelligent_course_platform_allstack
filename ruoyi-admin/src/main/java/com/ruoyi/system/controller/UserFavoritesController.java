@@ -108,4 +108,13 @@ public class UserFavoritesController extends BaseController
         return toAjax(result);
     }
 
+    @PreAuthorize("@ss.hasPermi('system:favorites:query')")
+    @GetMapping("/listByCriteria")
+    public TableDataInfo listByCriteria(UserFavorites userFavorites) {
+        startPage(); // 分页
+        List<UserFavorites> list = userFavoritesService.selectUserFavoritesByCriteria(userFavorites);
+        return getDataTable(list);
+    }
+
+
 }

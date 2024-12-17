@@ -97,4 +97,11 @@ public class UserFavoritesServiceImpl implements IUserFavoritesService {
         }
         return favoriteIds.length;
     }
+
+    @Override
+    public List<UserFavorites> selectUserFavoritesByCriteria(UserFavorites userFavorites) {
+        return userFavoritesMapper.selectUserFavoritesByCriteria(userFavorites);
+    }
+
+
 }

@@ -51,3 +51,16 @@ export function toggleFavorite(data) {
     data: data
   })
 }
+
+
+
+// 查询用户收藏列表（支持用户名和时间）
+export function listFavoritesByCriteria(query) {
+  return request({
+    url: '/system/favorites/listByCriteria',
+    method: 'get',
+    params: query,
+  });
+}
+
+

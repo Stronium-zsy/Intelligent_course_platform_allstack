@@ -29,6 +29,18 @@ public class UserFavorites extends BaseEntity
     private Long postId;
 
     private String postTitle; // 新增字段：帖子标题
+
+    private String userName;
+
+
+    public String getUserName() { // 新增 Getter
+        return userName;
+    }
+
+    public void setUserName(String userName) { // 新增 Setter
+        this.userName = userName;
+    }
+
     /** 收藏时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "收藏时间", width = 30, dateFormat = "yyyy-MM-dd")
@@ -82,11 +94,13 @@ public class UserFavorites extends BaseEntity
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("favoriteId", getFavoriteId())
-            .append("userId", getUserId())
-            .append("postId", getPostId())
-            .append("favoriteTime", getFavoriteTime())
-            .toString();
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("favoriteId", getFavoriteId())
+                .append("userId", getUserId())
+                .append("postId", getPostId())
+                .append("favoriteTime", getFavoriteTime())
+                .append("postTitle", getPostTitle()) // 添加 postTitle
+                .toString();
     }
+
 }

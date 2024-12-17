@@ -1,20 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户ID" prop="userId">
+    <!-- 查询条件表单 -->
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" label-width="80px">
+      <el-form-item label="用户名" prop="userName">
         <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户ID"
+          v-model="queryParams.userName"
+          placeholder="请输入用户名"
           clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="帖子ID" prop="postId">
-        <el-input
-          v-model="queryParams.postId"
-          placeholder="请输入帖子ID"
-          clearable
-          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="收藏时间" prop="favoriteTime">
@@ -24,7 +16,7 @@
           type="date"
           value-format="yyyy-MM-dd"
           placeholder="请选择收藏时间"
-        />
+        ></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -44,14 +36,19 @@
           v-hasPermi="['system:favorites:remove']"
         >删除</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
+    <!-- 收藏列表表格 -->
     <el-table v-loading="loading" :data="favoritesList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="收藏记录ID" align="center" prop="favoriteId" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="帖子ID" align="center" prop="postId" />
+      <el-table-column label="用户名" align="center" prop="userName" />
+      <el-table-column label="帖子标题" align="center">
+        <template slot-scope="scope">
+          <el-link type="primary" @click="viewPostDetail(scope.row.postId)">
+            {{ scope.row.postTitle || '无标题' }}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="收藏时间" align="center" prop="favoriteTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.favoriteTime, '{y}-{m}-{d}') }}</span>
@@ -59,11 +56,6 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            @click="viewPost(scope.row.postId)"
-          >查看帖子</el-button>
           <el-button
             size="mini"
             type="text"
@@ -86,93 +78,107 @@
 </template>
 
 <script>
-import { listFavorites, delFavorites } from "@/api/system/favorites";
+import { listFavoritesByCriteria, listFavorites, delFavorites } from "@/api/system/favorites";
 
 export default {
   name: "Favorites",
   data() {
     return {
-      // 遮罩层
-      loading: true,
-      // 选中数组
-      ids: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 用户收藏表格数据
+      loading: false,
       favoritesList: [],
-      // 查询参数
+      total: 0,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        userId: null,
-        postId: null,
-        favoriteTime: null
-      }
+        userName: '',
+        favoriteTime: null,
+      },
+      ids: [],
+      multiple: true,
+      isSearching: false, // 区分是否在执行搜索操作
     };
   },
   created() {
-    this.getList();
+    this.getInitialList();
   },
   methods: {
-    /** 查询用户收藏列表 */
-    getList() {
+    /** 获取初始收藏列表，仅加载当前用户的收藏 */
+    getInitialList() {
       this.loading = true;
-      listFavorites(this.queryParams).then((response) => {
+      const userId = this.$store.state.user.id; // 当前登录用户ID
+      listFavorites({ userId, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((response) => {
         this.favoritesList = response.rows;
         this.total = response.total;
         this.loading = false;
+        this.isSearching = false; // 标记非搜索状态
+      });
+    },
+    /** 查询收藏列表（支持用户名或时间条件） */
+    getList() {
+      this.loading = true;
+      listFavoritesByCriteria(this.queryParams).then((response) => {
+        this.favoritesList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+        this.isSearching = true; // 标记为搜索状态
       });
     },
     /** 搜索按钮操作 */
     handleQuery() {
+      if (this.queryParams.favoriteTime && !this.queryParams.userName) {
+        this.$message.error('请输入用户名后再按日期查询');
+        return;
+      }
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
+    /** 重置查询条件 */
     resetQuery() {
       this.queryParams = {
         pageNum: 1,
         pageSize: 10,
-        userId: null,
-        postId: null,
-        favoriteTime: null
+        userName: '',
+        favoriteTime: null,
       };
-      this.getList();
+      this.getInitialList(); // 重置时回到初始收藏列表
     },
-    // 多选框选中数据
+    /** 处理多选框选择事件 */
     handleSelectionChange(selection) {
       this.ids = selection.map((item) => item.favoriteId);
-      this.single = selection.length !== 1;
-      this.multiple = !selection.length;
+      this.multiple = !this.ids.length;
     },
-    /** 查看帖子详情 */
-    viewPost(postId) {
-      this.$router.push({
-        name: "PostDetail", // 对应路由名称
-        params: {postId}  // 帖子ID
+    /** 删除收藏记录 */
+    handleDelete(row) {
+      const favoriteIds = row ? [row.favoriteId] : this.ids;
+      this.$modal.confirm('是否确认删除选中的收藏记录？').then(() => {
+        return delFavorites(favoriteIds);
+      }).then(() => {
+        if (this.isSearching) {
+          this.getList(); // 搜索状态时刷新搜索结果
+        } else {
+          this.getInitialList(); // 非搜索状态时刷新初始列表
+        }
+        this.$modal.msgSuccess("删除成功");
       });
     },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const favoriteIds = row.favoriteId || this.ids;
-      this.$modal
-        .confirm('是否确认删除用户收藏编号为"' + favoriteIds + '"的数据项？')
-        .then(function () {
-          return delFavorites(favoriteIds);
-        })
-        .then(() => {
-          this.getList();
-          this.$modal.msgSuccess("删除成功");
-        })
-        .catch(() => {
-        });
-    }
-  }
+    /** 查看帖子详情 */
+    viewPostDetail(postId) {
+      if (!postId) {
+        this.$message.error('帖子不存在');
+        return;
+      }
+      this.$router.push({name: 'PostDetail', params: {postId}});
+    },
+  },
 };
 </script>
+
+<style scoped>
+.app-container {
+  padding: 20px;
+}
+
+.mb8 {
+  margin-bottom: 8px;
+}
+</style>

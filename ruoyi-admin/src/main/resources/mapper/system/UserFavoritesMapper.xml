@@ -10,32 +10,50 @@
         <result property="userId" column="user_id"/>
         <result property="postId" column="post_id"/>
         <result property="favoriteTime" column="favorite_time"/>
+        <result property="postTitle" column="post_title"/>
+        <result property="userName" column="user_name"/>
     </resultMap>
+
 
     <!-- 公共查询部分 -->
     <sql id="selectUserFavoritesVo">
-        SELECT favorite_id, user_id, post_id, favorite_time
-        FROM user_favorites
+        SELECT
+            uf.favorite_id,
+            uf.user_id,
+            uf.post_id,
+            uf.favorite_time,
+            p.title AS postTitle
+        FROM
+            user_favorites uf
+                LEFT JOIN posts p ON uf.post_id = p.post_id
     </sql>
 
+
     <!-- 查询收藏列表 -->
-    <select id="selectUserFavoritesList" parameterType="UserFavorites" resultMap="UserFavoritesResult">
+    <select id="selectUserFavoritesList" parameterType="map" resultMap="UserFavoritesResult">
         SELECT
         uf.favorite_id,
         uf.user_id,
         uf.post_id,
         uf.favorite_time,
-        p.title AS post_title
+        p.title AS post_title,
+        su.user_name AS user_name  <!-- 添加用户名字段 -->
         FROM
         user_favorites uf
-        LEFT JOIN
-        posts p ON uf.post_id = p.post_id
+        LEFT JOIN posts p ON uf.post_id = p.post_id
+        LEFT JOIN sys_user su ON uf.user_id = su.user_id <!-- 添加与 sys_user 的连接 -->
         <where>
-            <if test="userId != null"> AND uf.user_id = #{userId}</if>
-            <if test="postId != null"> AND uf.post_id = #{postId}</if>
-            <if test="favoriteTime != null"> AND uf.favorite_time = #{favoriteTime}</if>
+            <if test="userId != null">
+                AND uf.user_id = #{userId}
+            </if>
+            <if test="favoriteTime != null">
+                AND uf.favorite_time BETWEEN #{favoriteTime} AND DATE_ADD(#{favoriteTime}, INTERVAL 1 DAY)
+            </if>
         </where>
     </select>
+
+
+
 
 
     <!-- 根据收藏ID查询收藏 -->
@@ -117,5 +135,37 @@
     <select id="getFavoritesCountByPostId" parameterType="Long" resultType="int">
         SELECT COUNT(*) FROM user_favorites WHERE post_id = #{postId}
     </select>
+
+
+    <select id="selectUserFavoritesByCriteria" parameterType="UserFavorites" resultMap="UserFavoritesResult">
+        SELECT
+        uf.favorite_id,
+        uf.user_id,
+        uf.post_id,
+        uf.favorite_time,
+        p.title AS post_title,
+        su.user_name
+        FROM
+        user_favorites uf
+        LEFT JOIN
+        posts p ON uf.post_id = p.post_id
+        LEFT JOIN
+        sys_user su ON uf.user_id = su.user_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND su.user_name = #{userName}
+            </if>
+            <if test="(userName == null or userName == '') and userId != null">
+                AND uf.user_id = #{userId}
+            </if>
+            <if test="favoriteTime != null">
+                AND uf.favorite_time BETWEEN #{favoriteTime} AND DATE_ADD(#{favoriteTime}, INTERVAL 1 DAY)
+            </if>
+        </where>
+    </select>
+
+
+
+
 
 </mapper>
