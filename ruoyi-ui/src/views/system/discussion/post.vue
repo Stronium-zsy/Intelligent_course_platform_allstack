@@ -2,7 +2,6 @@
   <div class="post-detail">
     <el-button class="back-button" icon="el-icon-arrow-left" @click="goBack">返回</el-button>
 
-    <!-- 主帖子内容 -->
     <el-card v-if="post" class="post-card">
       <div class="post-header">
         <div class="author-info">
@@ -234,12 +233,15 @@ export default {
   padding: 20px;
 }
 
+.back-button {
+  margin-bottom: 20px;
+}
+
 .post-card {
   margin-bottom: 24px;
   background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
 }
 
 .post-header {
@@ -247,7 +249,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #ebeef5;
   padding-bottom: 10px;
 }
 
@@ -265,10 +267,11 @@ export default {
 .author-name {
   font-weight: 600;
   font-size: 16px;
+  color: #303133;
 }
 
 .post-time {
-  color: #8492a6;
+  color: #909399;
   font-size: 14px;
 }
 
@@ -276,14 +279,14 @@ export default {
   font-size: 24px;
   font-weight: bold;
   margin: 16px 0;
-  color: #333;
+  color: #303133;
 }
 
 .post-content {
   font-size: 16px;
   line-height: 1.6;
   margin-bottom: 24px;
-  color: #666;
+  color: #606266;
 }
 
 .post-stats {
@@ -293,26 +296,28 @@ export default {
   border-top: 1px solid #ebeef5;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #606266;
+.post-stats .el-button {
+  font-size: 14px;
 }
 
 .comments-section {
+  margin-top: 32px;
+}
 
+.comments-section h2 {
+  font-size: 20px;
+  color: #303133;
+  margin-bottom: 16px;
 }
 
 .comments-list {
-  max-height: 400px; /* 设置最大高度 */
-  overflow-y: auto; /* 启用垂直滚动条 */
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .comment-card {
   margin-bottom: 16px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 16px;
+  border-radius: 8px;
 }
 
 .comment-header {
@@ -326,12 +331,13 @@ export default {
   display: flex;
   gap: 8px;
   font-size: 14px;
-  color: #8492a6;
+  color: #909399;
 }
 
 .comment-content {
   margin-bottom: 16px;
   font-size: 16px;
+  color: #606266;
 }
 
 .reply-form-inline {
@@ -343,20 +349,27 @@ export default {
 
 .reply-form {
   background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
   padding: 1.5rem;
+  margin-top: 24px;
 }
 
-.author-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.reply-form h3 {
+  font-size: 18px;
+  color: #303133;
+  margin-bottom: 16px;
+}
+
+.is-liked,
+.is-bookmarked {
+  color: #409EFF;
 }
 
 @media screen and (max-width: 768px) {
   .post-detail {
     width: 100%;
+    padding: 10px;
   }
 
   .post-title {
@@ -369,7 +382,7 @@ export default {
 
   .post-stats {
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
   }
 
   .author-meta {
@@ -382,14 +395,9 @@ export default {
     margin-top: 5px;
   }
 
-  .comments-list {
-    flex-direction: column;
-    gap: 5px;
-  }
-
   .reply-form-inline {
-    flex-direction: row;
-    gap: 12px;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 </style>

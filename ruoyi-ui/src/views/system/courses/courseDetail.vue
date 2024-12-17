@@ -28,5 +28,6 @@ export default {
   padding: 20px;
   overflow-y: auto;
   height: 100vh;
+  background: #f6fbff;
 }
 </style>

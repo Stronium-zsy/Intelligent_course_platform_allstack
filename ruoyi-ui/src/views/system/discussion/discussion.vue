@@ -1,8 +1,6 @@
 <template>
+  <div class="discussion-board">
     <el-container>
-      <el-header class="header">
-        <h1 class="title">讨论板</h1>
-      </el-header>
       <el-main class="main">
         <el-row :gutter="20">
           <el-col :span="24">
@@ -58,6 +56,7 @@
         </el-row>
       </el-main>
     </el-container>
+  </div>
 </template>
 
 <script>
@@ -137,61 +136,60 @@ export default {
 
 <style scoped>
 .discussion-board {
-  width: 90%;
+  width: 75%;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #f5f5f5; /* 更浅的背景色 */
-  padding: 2rem;
+  background-color: #f6fbff;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
 
 .title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #333;
-  border-bottom: 2px solid #e6e6e6; /* 添加下划线 */
-  padding-bottom: 0.5rem;
 }
 
 .main {
-  background-color: #fff; /* 白色背景 */
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .new-post-card {
   margin-bottom: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+}
+
+.new-post-card h2 {
+  margin-bottom: 1rem;
+  color: #409EFF;
 }
 
 .posts-list {
-  max-height: 600px; /* 设置最大高度 */
-  overflow-y: auto; /* 启用垂直滚动条 */
+  max-height: 800px;
+  overflow-y: auto;
 }
 
 .post-card {
   width: 100%;
   margin-bottom: 1.5rem;
-  border: 1px solid #ddd; /* 边框颜色 */
-  border-radius: 4px;
-  background-color: #fff;
-  padding: 1.5rem;
+  border-radius: 8px;
   transition: all 0.3s ease-in-out;
 }
 
 .post-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 悬停时的阴影效果 */
+  transform: translateY(-5px);
+}
+
+.post-link {
+  text-decoration: none;
+  color: inherit;
 }
 
 .post-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ddd; /* 分割线 */
+  border-bottom: 1px solid #ebeef5;
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -199,99 +197,73 @@ export default {
 .post-title {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #000;
+  color: #303133;
+  margin: 0;
 }
 
 .post-time {
   font-size: 0.9rem;
-  color: #999;
+  color: #909399;
 }
 
 .post-content {
-  color: #333;
+  color: #606266;
   line-height: 1.6;
+  margin-bottom: 1rem;
 }
 
 .post-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
-  border-top: 1px solid #ddd; /* 分割线 */
+  border-top: 1px solid #ebeef5;
   padding-top: 0.5rem;
 }
 
 .post-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: #606266;
+}
+
+.post-stats {
+  display: flex;
+  align-items: center;
+}
+
+.stat-button {
+  padding: 0;
+  margin-right: 1rem;
 }
 
 .read-more {
-  font-size: 0.9rem;
-  color: #0057e7; /* 蓝色链接颜色 */
+  color: #409EFF;
 }
 
 .read-more:hover {
   text-decoration: underline;
 }
 
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .discussion-board {
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .post-card {
-    padding: 1rem;
-  }
-
-  .post-title {
-    font-size: 1.2rem; /* 调整标题字体大小 */
-  }
-
-  .post-time {
-    font-size: 0.8rem;
-  }
-
-  .post-author,
-  .post-stats {
-    font-size: 0.8rem;
-  }
-
-  .new-post-card h2 {
-    font-size: 1.5rem; /* 调整新帖标题字体大小 */
-  }
-}
-
-/* 响应式设计 */
 @media (max-width: 768px) {
   .discussion-board {
     width: 100%;
+  }
+
+  .main {
     padding: 1rem;
   }
 
-  .post-card {
-    padding: 1rem;
-  }
-
-  /* 将 .post-footer 改为垂直排列 */
   .post-footer {
     flex-direction: column;
-    align-items: flex-start; /* 让子元素对齐左边 */
-    gap: 10px; /* 子元素之间的间距 */
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
-  /* 调整 post-footer 中的子元素 */
-  .post-author,
   .post-stats {
-    font-size: 0.8rem;
-    color: #666;
-  }
-
-  /* 调整按钮和链接的位置 */
-  .read-more {
-    align-self: flex-start; /* 确保 "阅读更多" 按钮在左侧 */
+    width: 100%;
+    justify-content: space-between;
   }
 }
 </style>

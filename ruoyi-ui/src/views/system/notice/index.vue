@@ -174,6 +174,7 @@
       </div>
     </el-dialog>
 
+    <!-- 查看公告详情 -->
     <el-dialog
       title="公告详情"
       :visible.sync="dialogVisible"
@@ -182,16 +183,23 @@
     >
       <el-form v-if="noticeDetail" :model="noticeDetail" label-width="0">
         <!-- 标题 -->
-        <el-row :gutter="20" style="margin-bottom: 20px;">
+        <el-row :gutter="20">
           <el-col :span="24">
-            <h2 style="text-align: left; margin: 20px 0 20px 40px; font-size: 24px; font-weight: bold;">
+            <h2 style="text-align: left; margin: 20px; font-size: 24px; font-weight: bold; color: #333;">
               {{ noticeDetail.noticeTitle }}
             </h2>
           </el-col>
         </el-row>
 
+        <!-- 分隔线 -->
+        <el-row>
+          <el-col :span="24">
+            <hr style="border: 0; border-top: 1px solid #e4e7ed; margin: 20px 0;" />
+          </el-col>
+        </el-row>
+
         <!-- 创建人和创建时间 -->
-        <el-row :gutter="20">
+        <el-row :gutter="20" style="margin-bottom: 20px;">
           <el-col :span="12">
             <el-form-item label="创建者" label-width="80px">
               <span>{{ noticeDetail.createBy }}</span>
@@ -209,7 +217,7 @@
           <el-col :span="24">
             <el-form-item label="内容" label-width="80px">
               <div
-                style="border: 1px solid #e4e7ed; padding: 15px; border-radius: 5px; background: #f9f9f9; max-height: 300px; overflow-y: auto;"
+                style="border: 1px solid #e4e7ed; padding: 10px; border-radius: 8px; background: #f9f9f9; max-height: 300px; min-height: 150px; overflow-y: auto; font-size: 16px; color: #555; width: 90%;"
               >
                 <div v-html="noticeDetail.noticeContent"></div>
               </div>
