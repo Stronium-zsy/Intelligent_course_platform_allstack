@@ -3,12 +3,13 @@ from flask_cors import CORS
 from flask import Flask, request, jsonify
 
 import arranger
-
+import calculater
 app = Flask(__name__)
 
 CORS(app)
 
 arg=arranger.arranger()
+cal=calculater.Calculater()
 
 @app.route('/arrange_homework',methods=['POST'])
 def homework():
@@ -27,8 +28,9 @@ def post_score():
 
 @app.route('/calculate',methods=['POST'])
 def calculate():
-    
+    data=request.get_json()
+    cal.calculate(data['homework_id'])
     return
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port='5000')
