@@ -23,6 +23,10 @@ public class CourseUser extends BaseEntity
     /** $column.columnComment */
     private Long userId;
 
+    private String userName;
+
+    private String roleName;
+
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private String role;
@@ -53,6 +57,12 @@ public class CourseUser extends BaseEntity
     {
         this.role = role;
     }
+
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+
+    public String getRoleName() { return roleName; }
+    public void setRoleName(String role_name) { this.roleName = role_name; }
 
     public String getRole() 
     {

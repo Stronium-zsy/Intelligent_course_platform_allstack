@@ -42,7 +42,7 @@ public class CourseUserController extends BaseController
     /**
      * 查询【请填写功能名称】列表
      */
-    @PreAuthorize("@ss.hasPermi('system:user:list')")
+    @PreAuthorize("@ss.hasPermi('system:courseUser:list')")
     @GetMapping("/list")
     public TableDataInfo list(CourseUser courseUser)
     {
@@ -52,9 +52,33 @@ public class CourseUserController extends BaseController
     }
 
     /**
+     * 查询全部选课用户列表
+     */
+    @PreAuthorize("@ss.hasPermi('system:courseUser:stu_list')")
+    @GetMapping("/userName_list")
+    public TableDataInfo userName_list(CourseUser courseUser)
+    {
+        startPage();
+        List<CourseUser> list = courseUserService.selectUserNameList(courseUser);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询其余学生列表
+     */
+    @PreAuthorize("@ss.hasPermi('system:courseUser:stu_list')")
+    @GetMapping("/stu_list")
+    public TableDataInfo stu_list(CourseUser courseUser)
+    {
+        startPage();
+        List<CourseUser> list = courseUserService.selectOtherStuList(courseUser);
+        return getDataTable(list);
+    }
+
+    /**
      * 导出【请填写功能名称】列表
      */
-    @PreAuthorize("@ss.hasPermi('system:user:export')")
+    @PreAuthorize("@ss.hasPermi('system:courseUser:export')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, CourseUser courseUser)
@@ -67,7 +91,7 @@ public class CourseUserController extends BaseController
     /**
      * 获取【请填写功能名称】详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:user:query')")
+    @PreAuthorize("@ss.hasPermi('system:courseUser:query')")
     @GetMapping(value = "/{courseId}")
     public AjaxResult getInfo(@PathVariable("courseId") Long courseId)
     {
@@ -77,20 +101,20 @@ public class CourseUserController extends BaseController
     /**
      * 新增【请填写功能名称】
      */
-    @PreAuthorize("@ss.hasPermi('system:user:add')")
+    @PreAuthorize("@ss.hasPermi('system:courseUser:add')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody CourseUser courseUser)
+    public AjaxResult add(@RequestBody List<CourseUser> courseUserList)
     {
 
 
-        return toAjax(courseUserService.insertCourseUser(courseUser));
+        return toAjax(courseUserService.insertCourseUser(courseUserList));
     }
 
     /**
      * 修改【请填写功能名称】
      */
-    @PreAuthorize("@ss.hasPermi('system:user:edit')")
+    @PreAuthorize("@ss.hasPermi('system:courseUser:edit')")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CourseUser courseUser)
@@ -101,11 +125,14 @@ public class CourseUserController extends BaseController
     /**
      * 删除【请填写功能名称】
      */
-    @PreAuthorize("@ss.hasPermi('system:user:remove')")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{courseIds}")
-    public AjaxResult remove(@PathVariable Long[] courseIds)
+    @PreAuthorize("@ss.hasPermi('system:courseUser:remove')")  // 权限验证
+    @Log(title = "删除课程用户", businessType = BusinessType.DELETE)  // 日志记录
+    @DeleteMapping("/{courseId}/{userId}")
+    public AjaxResult remove(@PathVariable Long courseId, @PathVariable Long userId)
     {
-        return toAjax(courseUserService.deleteCourseUserByCourseIds(courseIds));
+        CourseUser courseUser = new CourseUser();
+        courseUser.setCourseId(courseId);
+        courseUser.setUserId(userId);
+        return toAjax(courseUserService.deleteCourseUserByUserIds(courseUser));
     }
 }

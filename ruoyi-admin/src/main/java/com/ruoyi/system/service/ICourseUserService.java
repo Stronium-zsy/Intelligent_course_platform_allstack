@@ -28,12 +28,22 @@ public interface ICourseUserService
     public List<CourseUser> selectCourseUserList(CourseUser courseUser);
 
     /**
+     * 查询【请填写功能名称】列表
+     *
+     * @param courseUser 【请填写功能名称】
+     * @return 【请填写功能名称】集合
+     */
+    public List<CourseUser> selectUserNameList(CourseUser courseUser);
+
+    public List<CourseUser> selectOtherStuList(CourseUser courseUser);
+
+    /**
      * 新增【请填写功能名称】
      * 
-     * @param courseUser 【请填写功能名称】
+     * @param courseUserList 【请填写功能名称】
      * @return 结果
      */
-    public int insertCourseUser(CourseUser courseUser);
+    public int insertCourseUser(List<CourseUser> courseUserList);
 
     /**
      * 修改【请填写功能名称】
@@ -45,11 +55,11 @@ public interface ICourseUserService
 
     /**
      * 批量删除【请填写功能名称】
-     * 
-     * @param courseIds 需要删除的【请填写功能名称】主键集合
+     *
+     * @param courseUser 需要删除的课程Id
      * @return 结果
      */
-    public int deleteCourseUserByCourseIds(Long[] courseIds);
+    public int deleteCourseUserByUserIds(CourseUser courseUser);
 
     /**
      * 删除【请填写功能名称】信息

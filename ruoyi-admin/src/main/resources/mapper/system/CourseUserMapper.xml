@@ -7,12 +7,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="CourseUser" id="CourseUserResult">
         <result property="courseId"    column="course_id"    />
         <result property="userId"    column="user_id"    />
+        <result property="userName" column="user_name"  />
         <result property="role"    column="role"    />
+        <result property="roleName" column="role_name"/>
         <result property="enrolledAt"    column="enrolled_at"    />
     </resultMap>
 
     <sql id="selectCourseUserVo">
         select course_id, user_id, role, enrolled_at from course_user
+    </sql>
+
+    <sql id="selectUserNameVo">
+        select course_id, user_id, user_name, role, enrolled_at from course_user
+    </sql>
+
+    <sql id="selectOtherStuVo">
+        select su.user_id, user_name, role_name, enrolled_at from sys_user su
     </sql>
 
     <select id="selectCourseUserList" parameterType="CourseUser" resultMap="CourseUserResult">
@@ -22,27 +32,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="enrolledAt != null "> and enrolled_at = #{enrolledAt}</if>
         </where>
     </select>
+
+    <!-- 获得选课用户的姓名 -->
+    <select id="selectUserNameList" parameterType="CourseUser" resultMap="CourseUserResult">
+        <include refid="selectUserNameVo"/>
+            NATURAL JOIN sys_user
+            WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获得全部未选course_id的用户 -->
+    <select id="selectOtherStuList" parameterType="CourseUser" resultMap="CourseUserResult">
+        <include refid="selectOtherStuVo"/>
+        LEFT JOIN course_user cu on su.user_id = cu.user_id AND cu.course_id = #{courseId}
+        LEFT JOIN sys_user_role sur ON su.user_id = sur.user_id
+        LEFT JOIN sys_role sr on sur.role_id = sr.role_id
+        WHERE cu.user_id IS NULL
+    </select>
     
     <select id="selectCourseUserByCourseId" parameterType="Long" resultMap="CourseUserResult">
         <include refid="selectCourseUserVo"/>
         where course_id = #{courseId}
     </select>
 
-    <insert id="insertCourseUser" parameterType="CourseUser">
+    <!-- 批量插入 -->
+    <insert id="insertCourseUser" parameterType="java.util.List">
         insert into course_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="courseId != null">course_id,</if>
-            <if test="userId != null">user_id,</if>
-            <if test="role != null and role != ''">role,</if>
-            <if test="enrolledAt != null">enrolled_at,</if>
-         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="courseId != null">#{courseId},</if>
-            <if test="userId != null">#{userId},</if>
-            <if test="role != null and role != ''">#{role},</if>
-            <if test="enrolledAt != null">#{enrolledAt},</if>
-         </trim>
+            <if test="courseUserList != null and courseUserList.size() > 0">
+                <if test="courseUserList[0].courseId != null">course_id,</if>
+                <if test="courseUserList[0].userId != null">user_id,</if>
+            </if>
+        </trim>
+            values
+        <foreach collection="courseUserList" item="courseUser" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="courseUser.courseId != null">#{courseUser.courseId},</if>
+                <if test="courseUser.userId != null">#{courseUser.userId},</if>
+            </trim>
+        </foreach>
     </insert>
+
 
     <update id="updateCourseUser" parameterType="CourseUser">
         update course_user
@@ -58,10 +87,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from course_user where course_id = #{courseId}
     </delete>
 
-    <delete id="deleteCourseUserByCourseIds" parameterType="String">
-        delete from course_user where course_id in 
-        <foreach item="courseId" collection="array" open="(" separator="," close=")">
-            #{courseId}
-        </foreach>
+    <delete id="deleteCourseUserByCourseIds" parameterType="CourseUser">
+        delete from course_user where course_id = #{courseId} AND user_id = #{userId}
+
     </delete>
 </mapper>

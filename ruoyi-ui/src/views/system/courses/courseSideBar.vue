@@ -67,6 +67,10 @@
         <i class="el-icon-chat-dot-round"></i>
         <span>课程讨论</span>
       </el-menu-item>
+      <el-menu-item :index="`/courseDetail/${courseId}/courseUser`" @click="navigateTo(`/courseDetail/${courseId}/courseUser`)">
+        <i class="el-icon-user-solid"></i>
+        <span>人员管理</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

@@ -158,6 +158,12 @@ export const constantRoutes = [
         name: "Homework",
         component: () => import('@/views/system/homework/courseHomework.vue'),
         meta: { title: "课程作业" }
+      },
+      {
+        path:'/courseDetail/:courseId/courseUser',
+        name: "CourseUser",
+        component: () => import('@/views/system/courses/courseUser.vue'),
+        meta: { title: "人员管理"}
       }
     ]
   },

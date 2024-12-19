@@ -44,15 +44,33 @@ public class CourseUserServiceImpl implements ICourseUserService
     }
 
     /**
+     * 查询【请填写功能名称】列表
+     *
+     * @param courseUser 【请填写功能名称】
+     * @return 【请填写功能名称】
+     */
+    @Override
+    public List<CourseUser> selectUserNameList(CourseUser courseUser)
+    {
+        return courseUserMapper.selectUserNameList(courseUser);
+    }
+
+    @Override
+    public List<CourseUser> selectOtherStuList(CourseUser courseUser)
+    {
+        return courseUserMapper.selectOtherStuList(courseUser);
+    }
+
+    /**
      * 新增【请填写功能名称】
      * 
-     * @param courseUser 【请填写功能名称】
+     * @param courseUserList 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int insertCourseUser(CourseUser courseUser)
+    public int insertCourseUser(List<CourseUser> courseUserList)
     {
-        return courseUserMapper.insertCourseUser(courseUser);
+        return courseUserMapper.insertCourseUser(courseUserList);
     }
 
     /**
@@ -69,14 +87,14 @@ public class CourseUserServiceImpl implements ICourseUserService
 
     /**
      * 批量删除【请填写功能名称】
-     * 
-     * @param courseIds 需要删除的【请填写功能名称】主键
+     *
+     * @param courseUser 需要删除的课程Id
      * @return 结果
      */
     @Override
-    public int deleteCourseUserByCourseIds(Long[] courseIds)
+    public int deleteCourseUserByUserIds(CourseUser courseUser)
     {
-        return courseUserMapper.deleteCourseUserByCourseIds(courseIds);
+        return courseUserMapper.deleteCourseUserByCourseIds(courseUser);
     }
 
     /**
