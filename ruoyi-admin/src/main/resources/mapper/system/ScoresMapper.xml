@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ScoresMapper">
+    
+    <resultMap type="Scores" id="ScoresResult">
+        <result property="scorer"    column="scorer"    />
+        <result property="bescorer"    column="bescorer"    />
+        <result property="homeworkId"    column="homework_id"    />
+        <result property="score"    column="score"    />
+    </resultMap>
+
+    <sql id="selectScoresVo">
+        select scorer, bescorer, homework_id, score from scores
+    </sql>
+
+    <select id="selectScoresList" parameterType="Scores" resultMap="ScoresResult">
+        <include refid="selectScoresVo"/>
+        <where>  
+            <if test="score != null "> and score = #{score}</if>
+        </where>
+    </select>
+    
+    <select id="selectScoresByScorer" parameterType="String" resultMap="ScoresResult">
+        <include refid="selectScoresVo"/>
+        where scorer = #{scorer}
+    </select>
+
+    <insert id="insertScores" parameterType="Scores">
+        insert into scores
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scorer != null">scorer,</if>
+            <if test="bescorer != null">bescorer,</if>
+            <if test="homeworkId != null">homework_id,</if>
+            <if test="score != null">score,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scorer != null">#{scorer},</if>
+            <if test="bescorer != null">#{bescorer},</if>
+            <if test="homeworkId != null">#{homeworkId},</if>
+            <if test="score != null">#{score},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScores" parameterType="Scores">
+        update scores
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bescorer != null">bescorer = #{bescorer},</if>
+            <if test="homeworkId != null">homework_id = #{homeworkId},</if>
+            <if test="score != null">score = #{score},</if>
+        </trim>
+        where scorer = #{scorer}
+    </update>
+
+    <delete id="deleteScoresByScorer" parameterType="String">
+        delete from scores where scorer = #{scorer}
+    </delete>
+
+    <delete id="deleteScoresByScorers" parameterType="String">
+        delete from scores where scorer in 
+        <foreach item="scorer" collection="array" open="(" separator="," close=")">
+            #{scorer}
+        </foreach>
+    </delete>
+</mapper>

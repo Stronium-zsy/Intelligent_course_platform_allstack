@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.PTableMapper">
+    
+    <resultMap type="PTable" id="PTableResult">
+        <result property="studentId"    column="student_id"    />
+        <result property="P"    column="P"    />
+    </resultMap>
+
+    <sql id="selectPTableVo">
+        select student_id, P from p_table
+    </sql>
+
+    <select id="selectPTableList" parameterType="PTable" resultMap="PTableResult">
+        <include refid="selectPTableVo"/>
+        <where>  
+            <if test="studentId != null  and studentId != ''"> and student_id = #{studentId}</if>
+            <if test="P != null "> and P = #{P}</if>
+        </where>
+    </select>
+    
+    <select id="selectPTableByStudentId" parameterType="String" resultMap="PTableResult">
+        <include refid="selectPTableVo"/>
+        where student_id = #{studentId}
+    </select>
+
+    <insert id="insertPTable" parameterType="PTable">
+        insert into p_table
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId != ''">student_id,</if>
+            <if test="P != null">P,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null and studentId != ''">#{studentId},</if>
+            <if test="P != null">#{P},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePTable" parameterType="PTable">
+        update p_table
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="P != null">P = #{P},</if>
+        </trim>
+        where student_id = #{studentId}
+    </update>
+
+    <delete id="deletePTableByStudentId" parameterType="String">
+        delete from p_table where student_id = #{studentId}
+    </delete>
+
+    <delete id="deletePTableByStudentIds" parameterType="String">
+        delete from p_table where student_id in 
+        <foreach item="studentId" collection="array" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+</mapper>
