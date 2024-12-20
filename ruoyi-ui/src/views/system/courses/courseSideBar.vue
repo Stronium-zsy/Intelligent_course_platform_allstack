@@ -71,6 +71,11 @@
         <i class="el-icon-user-solid"></i>
         <span>人员管理</span>
       </el-menu-item>
+      <!-- 作业互评菜单项 -->
+      <el-menu-item :index="`/courseDetail/${courseId}/coursePeerReview`" @click="navigateTo(`/courseDetail/${courseId}/coursePeerReview`)">
+        <i class="el-icon-s-check"></i>
+        <span>作业互评</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

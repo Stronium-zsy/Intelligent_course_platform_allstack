@@ -164,6 +164,12 @@ export const constantRoutes = [
         name: "CourseUser",
         component: () => import('@/views/system/courses/courseUser.vue'),
         meta: { title: "人员管理"}
+      },
+      {
+        path: '/courseDetail/:courseId/coursePeerReview',
+        name: 'CoursePeerReview',
+        component: () => import('@/views/system/scores/scores.vue'),
+        meta: { title: '作业互评' }
       }
     ]
   },
