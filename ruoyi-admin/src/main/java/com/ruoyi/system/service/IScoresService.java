@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.HomeworkSubmissions;
 import com.ruoyi.system.domain.Scores;
 
 /**
@@ -58,4 +60,6 @@ public interface IScoresService
      * @return 结果
      */
     public int deleteScoresByScorer(String scorer);
+
+    public List<HomeworkSubmissions> getReviewTasksByJudger(Long judger);
 }

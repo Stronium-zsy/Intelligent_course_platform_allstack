@@ -11,6 +11,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="score"    column="score"    />
     </resultMap>
 
+    <resultMap id="HomeworkSubmissionsResult" type="HomeworkSubmissions">
+        <result property="submissionId" column="submission_id" />
+        <result property="homeworkId" column="homework_id" />
+        <result property="userId" column="user_id" />
+        <result property="filePath" column="file_path" />
+        <result property="submittedAt" column="submitted_at" />
+        <result property="grade" column="grade" />
+        <result property="feedback" column="feedback" />
+        <result property="courseId" column="course_id" />
+    </resultMap>
+
+
     <sql id="selectScoresVo">
         select scorer, bescorer, homework_id, score from scores
     </sql>
@@ -63,4 +75,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{scorer}
         </foreach>
     </delete>
+
+    <select id="selectReviewTasksByJudger" parameterType="Long" resultMap="HomeworkSubmissionsResult">
+        SELECT hs.*
+        FROM scores s
+                 JOIN homework_submissions hs ON s.bescorer = hs.user_id AND s.homework_id = hs.homework_id
+        WHERE s.scorer = #{judger}
+    </select>
+
 </mapper>

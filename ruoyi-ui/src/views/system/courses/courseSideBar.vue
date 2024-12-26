@@ -76,6 +76,14 @@
         <i class="el-icon-s-check"></i>
         <span>作业互评</span>
       </el-menu-item>
+      <el-menu-item :index="`/courseDetail/${courseId}/publishiWork`" @click="navigateTo(`/courseDetail/${courseId}/publishiWork`)">
+        <i class="el-icon-s-check"></i>
+        <span>发布互评</span>
+      </el-menu-item>
+      <el-menu-item :index="`/courseDetail/${courseId}/mutiScore`" @click="navigateTo(`/courseDetail/${courseId}/mutiScore`)">
+        <i class="el-icon-s-check"></i>
+        <span>学生互评</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

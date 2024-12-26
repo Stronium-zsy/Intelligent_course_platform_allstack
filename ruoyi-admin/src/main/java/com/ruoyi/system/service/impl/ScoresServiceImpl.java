@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.HomeworkSubmissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.ScoresMapper;
@@ -89,5 +91,9 @@ public class ScoresServiceImpl implements IScoresService
     public int deleteScoresByScorer(String scorer)
     {
         return scoresMapper.deleteScoresByScorer(scorer);
+    }
+
+    public List<HomeworkSubmissions> getReviewTasksByJudger(Long judger) {
+        return scoresMapper.selectReviewTasksByJudger(judger);
     }
 }

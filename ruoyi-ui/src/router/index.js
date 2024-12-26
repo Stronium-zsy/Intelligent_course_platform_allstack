@@ -170,6 +170,18 @@ export const constantRoutes = [
         name: 'CoursePeerReview',
         component: () => import('@/views/system/scores/scores.vue'),
         meta: { title: '作业互评' }
+      },
+      {
+        path: '/courseDetail/:courseId/publishiWork',
+        name: 'publishiWork',
+        component: () => import('@/views/system/scores/publishWork.vue'),
+        meta: { title: '发布互评' }
+      },
+      {
+        path: '/courseDetail/:courseId/mutiScore',
+        name: 'mutiScore',
+        component: () => import('@/views/system/scores/mutiScore.vue'),
+        meta: { title: '学生互评' }
       }
     ]
   },

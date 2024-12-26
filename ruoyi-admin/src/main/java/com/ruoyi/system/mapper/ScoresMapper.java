@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.ruoyi.system.domain.HomeworkSubmissions;
 import com.ruoyi.system.domain.Scores;
 
 /**
@@ -58,4 +60,6 @@ public interface ScoresMapper
      * @return 结果
      */
     public int deleteScoresByScorers(String[] scorers);
+
+    List<HomeworkSubmissions> selectReviewTasksByJudger(Long judger);
 }

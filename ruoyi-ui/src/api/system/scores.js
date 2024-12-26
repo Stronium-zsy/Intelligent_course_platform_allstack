@@ -42,3 +42,17 @@ export function delScores(scorer) {
     method: 'delete'
   })
 }
+
+// 获取需要互评的作业
+export function getReviewTasks(query) {
+  return request({
+    url: "/system/scores/reviewTasks",
+    method: "get",
+    params: query,
+  });
+}
+
+// 提交评分给 Flask
+export function submitScoresToFlask(data) {
+  return axios.post('http://127.0.0.1:5000/post_score', data);
+}
